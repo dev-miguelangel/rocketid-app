@@ -17,7 +17,7 @@ class Profile with _$Profile {
     String? stringId,
     String? bloodType,
     List<String>? allergies,
-    List<String>? conditions,
+    String? conditions,
     List<String>? medications,
     String? emergencyContactName,
     String? emergencyContactPhone,

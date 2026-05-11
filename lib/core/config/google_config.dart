@@ -51,4 +51,8 @@ class AuthBackendConfig {
   /// Endpoint que retorna el usuario autenticado a partir del `accessToken`
   /// enviado en el header `Authorization: Bearer <token>`.
   static const String mePath = '/auth/me';
+
+  /// Base path para mutaciones de Profile.
+  /// `PATCH /profiles/:id` actualiza campos editables del profile.
+  static const String profilesPath = '/profiles';
 }

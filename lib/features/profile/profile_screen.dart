@@ -13,6 +13,29 @@ final meProvider = FutureProvider.autoDispose<User>((ref) async {
   return authApi.me();
 });
 
+const bloodTypeOptions = <String, String>{
+  'O_POSITIVE': 'O+',
+  'O_NEGATIVE': 'O−',
+  'A_POSITIVE': 'A+',
+  'A_NEGATIVE': 'A−',
+  'B_POSITIVE': 'B+',
+  'B_NEGATIVE': 'B−',
+  'AB_POSITIVE': 'AB+',
+  'AB_NEGATIVE': 'AB−',
+};
+
+String? bloodTypeLabel(String? code) =>
+    code == null ? null : (bloodTypeOptions[code] ?? code);
+
+const genderOptions = <String, String>{
+  'male': 'Masculino',
+  'female': 'Femenino',
+  'other': 'Otro',
+};
+
+String? genderLabel(String? code) =>
+    code == null ? null : (genderOptions[code] ?? code);
+
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -76,6 +99,28 @@ class _ProfileBody extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
         _Header(user: user),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.brandGreen,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            onPressed: user.profile == null
+                ? null
+                : () => context.push('/perfil/editar', extra: user),
+            icon: const Icon(Icons.edit, size: 18),
+            label: const Text(
+              'Editar perfil',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
         const SizedBox(height: 20),
         _Section(
           title: 'Información personal',
@@ -89,7 +134,7 @@ class _ProfileBody extends ConsumerWidget {
             _Row(
               icon: Icons.wc_outlined,
               label: 'Género',
-              value: profile?.gender,
+              value: genderLabel(profile?.gender),
             ),
             _Row(
               icon: Icons.location_city_outlined,
@@ -121,7 +166,7 @@ class _ProfileBody extends ConsumerWidget {
             _Row(
               icon: Icons.bloodtype_outlined,
               label: 'Tipo de sangre',
-              value: profile?.bloodType,
+              value: bloodTypeLabel(profile?.bloodType),
             ),
             _Row(
               icon: Icons.coronavirus_outlined,
@@ -131,7 +176,7 @@ class _ProfileBody extends ConsumerWidget {
             _Row(
               icon: Icons.healing_outlined,
               label: 'Condiciones',
-              value: _joinList(profile?.conditions),
+              value: profile?.conditions,
             ),
             _Row(
               icon: Icons.medication_outlined,

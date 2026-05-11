@@ -7,6 +7,7 @@ import 'features/auth/application/session_repository.dart';
 import 'features/auth/application/session_state.dart';
 import 'features/auth/data/auth_api.dart';
 import 'features/auth/data/google_sign_in_service.dart';
+import 'features/profile/data/profile_api.dart';
 
 class LogoutHandler {
   final Ref _ref;
@@ -47,6 +48,11 @@ final sessionControllerProvider =
 final authApiProvider = Provider<AuthApi>((ref) {
   final dio = ref.watch(dioProvider);
   return AuthApi(dio);
+});
+
+final profileApiProvider = Provider<ProfileApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return ProfileApi(dio);
 });
 
 final dioProvider = Provider<Dio>((ref) {

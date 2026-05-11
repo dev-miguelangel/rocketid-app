@@ -19,9 +19,7 @@ _$ProfileImpl _$$ProfileImplFromJson(Map<String, dynamic> json) =>
       allergies: (json['allergies'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      conditions: (json['conditions'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
+      conditions: json['conditions'] as String?,
       medications: (json['medications'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),

@@ -30,7 +30,7 @@ mixin _$Profile {
   String? get stringId => throw _privateConstructorUsedError;
   String? get bloodType => throw _privateConstructorUsedError;
   List<String>? get allergies => throw _privateConstructorUsedError;
-  List<String>? get conditions => throw _privateConstructorUsedError;
+  String? get conditions => throw _privateConstructorUsedError;
   List<String>? get medications => throw _privateConstructorUsedError;
   String? get emergencyContactName => throw _privateConstructorUsedError;
   String? get emergencyContactPhone => throw _privateConstructorUsedError;
@@ -63,7 +63,7 @@ abstract class $ProfileCopyWith<$Res> {
     String? stringId,
     String? bloodType,
     List<String>? allergies,
-    List<String>? conditions,
+    String? conditions,
     List<String>? medications,
     String? emergencyContactName,
     String? emergencyContactPhone,
@@ -146,7 +146,7 @@ class _$ProfileCopyWithImpl<$Res, $Val extends Profile>
             conditions: freezed == conditions
                 ? _value.conditions
                 : conditions // ignore: cast_nullable_to_non_nullable
-                      as List<String>?,
+                      as String?,
             medications: freezed == medications
                 ? _value.medications
                 : medications // ignore: cast_nullable_to_non_nullable
@@ -196,7 +196,7 @@ abstract class _$$ProfileImplCopyWith<$Res> implements $ProfileCopyWith<$Res> {
     String? stringId,
     String? bloodType,
     List<String>? allergies,
-    List<String>? conditions,
+    String? conditions,
     List<String>? medications,
     String? emergencyContactName,
     String? emergencyContactPhone,
@@ -276,9 +276,9 @@ class __$$ProfileImplCopyWithImpl<$Res>
             : allergies // ignore: cast_nullable_to_non_nullable
                   as List<String>?,
         conditions: freezed == conditions
-            ? _value._conditions
+            ? _value.conditions
             : conditions // ignore: cast_nullable_to_non_nullable
-                  as List<String>?,
+                  as String?,
         medications: freezed == medications
             ? _value._medications
             : medications // ignore: cast_nullable_to_non_nullable
@@ -321,7 +321,7 @@ class _$ProfileImpl extends _Profile {
     this.stringId,
     this.bloodType,
     final List<String>? allergies,
-    final List<String>? conditions,
+    this.conditions,
     final List<String>? medications,
     this.emergencyContactName,
     this.emergencyContactPhone,
@@ -329,7 +329,6 @@ class _$ProfileImpl extends _Profile {
     this.createdAt,
     this.updatedAt,
   }) : _allergies = allergies,
-       _conditions = conditions,
        _medications = medications,
        super._();
 
@@ -362,16 +361,8 @@ class _$ProfileImpl extends _Profile {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<String>? _conditions;
   @override
-  List<String>? get conditions {
-    final value = _conditions;
-    if (value == null) return null;
-    if (_conditions is EqualUnmodifiableListView) return _conditions;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
-
+  final String? conditions;
   final List<String>? _medications;
   @override
   List<String>? get medications {
@@ -418,10 +409,8 @@ class _$ProfileImpl extends _Profile {
               other._allergies,
               _allergies,
             ) &&
-            const DeepCollectionEquality().equals(
-              other._conditions,
-              _conditions,
-            ) &&
+            (identical(other.conditions, conditions) ||
+                other.conditions == conditions) &&
             const DeepCollectionEquality().equals(
               other._medications,
               _medications,
@@ -455,7 +444,7 @@ class _$ProfileImpl extends _Profile {
     stringId,
     bloodType,
     const DeepCollectionEquality().hash(_allergies),
-    const DeepCollectionEquality().hash(_conditions),
+    conditions,
     const DeepCollectionEquality().hash(_medications),
     emergencyContactName,
     emergencyContactPhone,
@@ -489,7 +478,7 @@ abstract class _Profile extends Profile {
     final String? stringId,
     final String? bloodType,
     final List<String>? allergies,
-    final List<String>? conditions,
+    final String? conditions,
     final List<String>? medications,
     final String? emergencyContactName,
     final String? emergencyContactPhone,
@@ -520,7 +509,7 @@ abstract class _Profile extends Profile {
   @override
   List<String>? get allergies;
   @override
-  List<String>? get conditions;
+  String? get conditions;
   @override
   List<String>? get medications;
   @override
