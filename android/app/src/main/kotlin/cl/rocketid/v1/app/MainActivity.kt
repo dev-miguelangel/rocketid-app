@@ -1,4 +1,4 @@
-package com.example.rocketid_new_app
+package cl.rocketid.v1.app
 
 import io.flutter.embedding.android.FlutterActivity
 
