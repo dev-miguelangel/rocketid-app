@@ -23,6 +23,13 @@ User _$UserFromJson(Map<String, dynamic> json) {
 mixin _$User {
   String get id => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
+  String? get avatar => throw _privateConstructorUsedError;
+  String? get role => throw _privateConstructorUsedError;
+  String? get status => throw _privateConstructorUsedError;
+  int? get onboardingStep => throw _privateConstructorUsedError;
+  String? get createdAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
   Profile? get profile => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
@@ -39,7 +46,18 @@ abstract class $UserCopyWith<$Res> {
   factory $UserCopyWith(User value, $Res Function(User) then) =
       _$UserCopyWithImpl<$Res, User>;
   @useResult
-  $Res call({String id, String email, Profile? profile});
+  $Res call({
+    String id,
+    String email,
+    String? name,
+    String? avatar,
+    String? role,
+    String? status,
+    int? onboardingStep,
+    String? createdAt,
+    String? updatedAt,
+    Profile? profile,
+  });
 
   $ProfileCopyWith<$Res>? get profile;
 }
@@ -61,6 +79,13 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   $Res call({
     Object? id = null,
     Object? email = null,
+    Object? name = freezed,
+    Object? avatar = freezed,
+    Object? role = freezed,
+    Object? status = freezed,
+    Object? onboardingStep = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? profile = freezed,
   }) {
     return _then(
@@ -73,6 +98,34 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
                       as String,
+            name: freezed == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            avatar: freezed == avatar
+                ? _value.avatar
+                : avatar // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            role: freezed == role
+                ? _value.role
+                : role // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            status: freezed == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            onboardingStep: freezed == onboardingStep
+                ? _value.onboardingStep
+                : onboardingStep // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            createdAt: freezed == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as String?,
             profile: freezed == profile
                 ? _value.profile
                 : profile // ignore: cast_nullable_to_non_nullable
@@ -105,7 +158,18 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   ) = __$$UserImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String email, Profile? profile});
+  $Res call({
+    String id,
+    String email,
+    String? name,
+    String? avatar,
+    String? role,
+    String? status,
+    int? onboardingStep,
+    String? createdAt,
+    String? updatedAt,
+    Profile? profile,
+  });
 
   @override
   $ProfileCopyWith<$Res>? get profile;
@@ -125,6 +189,13 @@ class __$$UserImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? email = null,
+    Object? name = freezed,
+    Object? avatar = freezed,
+    Object? role = freezed,
+    Object? status = freezed,
+    Object? onboardingStep = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? profile = freezed,
   }) {
     return _then(
@@ -137,6 +208,34 @@ class __$$UserImplCopyWithImpl<$Res>
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
                   as String,
+        name: freezed == name
+            ? _value.name
+            : name // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        avatar: freezed == avatar
+            ? _value.avatar
+            : avatar // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        role: freezed == role
+            ? _value.role
+            : role // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        status: freezed == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        onboardingStep: freezed == onboardingStep
+            ? _value.onboardingStep
+            : onboardingStep // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        createdAt: freezed == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as String?,
         profile: freezed == profile
             ? _value.profile
             : profile // ignore: cast_nullable_to_non_nullable
@@ -149,8 +248,18 @@ class __$$UserImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$UserImpl extends _User {
-  const _$UserImpl({required this.id, required this.email, this.profile})
-    : super._();
+  const _$UserImpl({
+    required this.id,
+    required this.email,
+    this.name,
+    this.avatar,
+    this.role,
+    this.status,
+    this.onboardingStep,
+    this.createdAt,
+    this.updatedAt,
+    this.profile,
+  }) : super._();
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -160,11 +269,25 @@ class _$UserImpl extends _User {
   @override
   final String email;
   @override
+  final String? name;
+  @override
+  final String? avatar;
+  @override
+  final String? role;
+  @override
+  final String? status;
+  @override
+  final int? onboardingStep;
+  @override
+  final String? createdAt;
+  @override
+  final String? updatedAt;
+  @override
   final Profile? profile;
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, profile: $profile)';
+    return 'User(id: $id, email: $email, name: $name, avatar: $avatar, role: $role, status: $status, onboardingStep: $onboardingStep, createdAt: $createdAt, updatedAt: $updatedAt, profile: $profile)';
   }
 
   @override
@@ -174,12 +297,34 @@ class _$UserImpl extends _User {
             other is _$UserImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.email, email) || other.email == email) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.avatar, avatar) || other.avatar == avatar) &&
+            (identical(other.role, role) || other.role == role) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.onboardingStep, onboardingStep) ||
+                other.onboardingStep == onboardingStep) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
             (identical(other.profile, profile) || other.profile == profile));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, email, profile);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    email,
+    name,
+    avatar,
+    role,
+    status,
+    onboardingStep,
+    createdAt,
+    updatedAt,
+    profile,
+  );
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -199,6 +344,13 @@ abstract class _User extends User {
   const factory _User({
     required final String id,
     required final String email,
+    final String? name,
+    final String? avatar,
+    final String? role,
+    final String? status,
+    final int? onboardingStep,
+    final String? createdAt,
+    final String? updatedAt,
     final Profile? profile,
   }) = _$UserImpl;
   const _User._() : super._();
@@ -209,6 +361,20 @@ abstract class _User extends User {
   String get id;
   @override
   String get email;
+  @override
+  String? get name;
+  @override
+  String? get avatar;
+  @override
+  String? get role;
+  @override
+  String? get status;
+  @override
+  int? get onboardingStep;
+  @override
+  String? get createdAt;
+  @override
+  String? get updatedAt;
   @override
   Profile? get profile;
 

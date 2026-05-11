@@ -11,6 +11,13 @@ class User with _$User {
   const factory User({
     required String id,
     required String email,
+    String? name,
+    String? avatar,
+    String? role,
+    String? status,
+    int? onboardingStep,
+    String? createdAt,
+    String? updatedAt,
     Profile? profile,
   }) = _User;
 

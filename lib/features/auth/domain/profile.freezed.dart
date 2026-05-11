@@ -22,11 +22,22 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Profile {
   String get id => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
-  String? get name => throw _privateConstructorUsedError;
-  String? get avatarUrl => throw _privateConstructorUsedError;
+  String? get birthDate => throw _privateConstructorUsedError;
+  String? get gender => throw _privateConstructorUsedError;
+  String? get city => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
+  String? get alias => throw _privateConstructorUsedError;
+  String? get stringId => throw _privateConstructorUsedError;
+  String? get bloodType => throw _privateConstructorUsedError;
+  List<String>? get allergies => throw _privateConstructorUsedError;
+  List<String>? get conditions => throw _privateConstructorUsedError;
+  List<String>? get medications => throw _privateConstructorUsedError;
+  String? get emergencyContactName => throw _privateConstructorUsedError;
+  String? get emergencyContactPhone => throw _privateConstructorUsedError;
+  String? get emergencyContactRelationship =>
+      throw _privateConstructorUsedError;
   String? get createdAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Profile to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -44,11 +55,21 @@ abstract class $ProfileCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    String email,
-    String? name,
-    String? avatarUrl,
+    String? birthDate,
+    String? gender,
+    String? city,
     String? phone,
+    String? alias,
+    String? stringId,
+    String? bloodType,
+    List<String>? allergies,
+    List<String>? conditions,
+    List<String>? medications,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
+    String? emergencyContactRelationship,
     String? createdAt,
+    String? updatedAt,
   });
 }
 
@@ -68,11 +89,21 @@ class _$ProfileCopyWithImpl<$Res, $Val extends Profile>
   @override
   $Res call({
     Object? id = null,
-    Object? email = null,
-    Object? name = freezed,
-    Object? avatarUrl = freezed,
+    Object? birthDate = freezed,
+    Object? gender = freezed,
+    Object? city = freezed,
     Object? phone = freezed,
+    Object? alias = freezed,
+    Object? stringId = freezed,
+    Object? bloodType = freezed,
+    Object? allergies = freezed,
+    Object? conditions = freezed,
+    Object? medications = freezed,
+    Object? emergencyContactName = freezed,
+    Object? emergencyContactPhone = freezed,
+    Object? emergencyContactRelationship = freezed,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -80,25 +111,66 @@ class _$ProfileCopyWithImpl<$Res, $Val extends Profile>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as String,
-            email: null == email
-                ? _value.email
-                : email // ignore: cast_nullable_to_non_nullable
-                      as String,
-            name: freezed == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
+            birthDate: freezed == birthDate
+                ? _value.birthDate
+                : birthDate // ignore: cast_nullable_to_non_nullable
                       as String?,
-            avatarUrl: freezed == avatarUrl
-                ? _value.avatarUrl
-                : avatarUrl // ignore: cast_nullable_to_non_nullable
+            gender: freezed == gender
+                ? _value.gender
+                : gender // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            city: freezed == city
+                ? _value.city
+                : city // ignore: cast_nullable_to_non_nullable
                       as String?,
             phone: freezed == phone
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
                       as String?,
+            alias: freezed == alias
+                ? _value.alias
+                : alias // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            stringId: freezed == stringId
+                ? _value.stringId
+                : stringId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            bloodType: freezed == bloodType
+                ? _value.bloodType
+                : bloodType // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            allergies: freezed == allergies
+                ? _value.allergies
+                : allergies // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
+            conditions: freezed == conditions
+                ? _value.conditions
+                : conditions // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
+            medications: freezed == medications
+                ? _value.medications
+                : medications // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
+            emergencyContactName: freezed == emergencyContactName
+                ? _value.emergencyContactName
+                : emergencyContactName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            emergencyContactPhone: freezed == emergencyContactPhone
+                ? _value.emergencyContactPhone
+                : emergencyContactPhone // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            emergencyContactRelationship:
+                freezed == emergencyContactRelationship
+                ? _value.emergencyContactRelationship
+                : emergencyContactRelationship // ignore: cast_nullable_to_non_nullable
+                      as String?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -116,11 +188,21 @@ abstract class _$$ProfileImplCopyWith<$Res> implements $ProfileCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    String email,
-    String? name,
-    String? avatarUrl,
+    String? birthDate,
+    String? gender,
+    String? city,
     String? phone,
+    String? alias,
+    String? stringId,
+    String? bloodType,
+    List<String>? allergies,
+    List<String>? conditions,
+    List<String>? medications,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
+    String? emergencyContactRelationship,
     String? createdAt,
+    String? updatedAt,
   });
 }
 
@@ -139,11 +221,21 @@ class __$$ProfileImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? email = null,
-    Object? name = freezed,
-    Object? avatarUrl = freezed,
+    Object? birthDate = freezed,
+    Object? gender = freezed,
+    Object? city = freezed,
     Object? phone = freezed,
+    Object? alias = freezed,
+    Object? stringId = freezed,
+    Object? bloodType = freezed,
+    Object? allergies = freezed,
+    Object? conditions = freezed,
+    Object? medications = freezed,
+    Object? emergencyContactName = freezed,
+    Object? emergencyContactPhone = freezed,
+    Object? emergencyContactRelationship = freezed,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _$ProfileImpl(
@@ -151,25 +243,65 @@ class __$$ProfileImplCopyWithImpl<$Res>
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as String,
-        email: null == email
-            ? _value.email
-            : email // ignore: cast_nullable_to_non_nullable
-                  as String,
-        name: freezed == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
+        birthDate: freezed == birthDate
+            ? _value.birthDate
+            : birthDate // ignore: cast_nullable_to_non_nullable
                   as String?,
-        avatarUrl: freezed == avatarUrl
-            ? _value.avatarUrl
-            : avatarUrl // ignore: cast_nullable_to_non_nullable
+        gender: freezed == gender
+            ? _value.gender
+            : gender // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        city: freezed == city
+            ? _value.city
+            : city // ignore: cast_nullable_to_non_nullable
                   as String?,
         phone: freezed == phone
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
                   as String?,
+        alias: freezed == alias
+            ? _value.alias
+            : alias // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        stringId: freezed == stringId
+            ? _value.stringId
+            : stringId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        bloodType: freezed == bloodType
+            ? _value.bloodType
+            : bloodType // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        allergies: freezed == allergies
+            ? _value._allergies
+            : allergies // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
+        conditions: freezed == conditions
+            ? _value._conditions
+            : conditions // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
+        medications: freezed == medications
+            ? _value._medications
+            : medications // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
+        emergencyContactName: freezed == emergencyContactName
+            ? _value.emergencyContactName
+            : emergencyContactName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        emergencyContactPhone: freezed == emergencyContactPhone
+            ? _value.emergencyContactPhone
+            : emergencyContactPhone // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        emergencyContactRelationship: freezed == emergencyContactRelationship
+            ? _value.emergencyContactRelationship
+            : emergencyContactRelationship // ignore: cast_nullable_to_non_nullable
+                  as String?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
                   as String?,
       ),
     );
@@ -181,12 +313,25 @@ class __$$ProfileImplCopyWithImpl<$Res>
 class _$ProfileImpl extends _Profile {
   const _$ProfileImpl({
     required this.id,
-    required this.email,
-    this.name,
-    this.avatarUrl,
+    this.birthDate,
+    this.gender,
+    this.city,
     this.phone,
+    this.alias,
+    this.stringId,
+    this.bloodType,
+    final List<String>? allergies,
+    final List<String>? conditions,
+    final List<String>? medications,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
+    this.emergencyContactRelationship,
     this.createdAt,
-  }) : super._();
+    this.updatedAt,
+  }) : _allergies = allergies,
+       _conditions = conditions,
+       _medications = medications,
+       super._();
 
   factory _$ProfileImpl.fromJson(Map<String, dynamic> json) =>
       _$$ProfileImplFromJson(json);
@@ -194,19 +339,63 @@ class _$ProfileImpl extends _Profile {
   @override
   final String id;
   @override
-  final String email;
+  final String? birthDate;
   @override
-  final String? name;
+  final String? gender;
   @override
-  final String? avatarUrl;
+  final String? city;
   @override
   final String? phone;
   @override
+  final String? alias;
+  @override
+  final String? stringId;
+  @override
+  final String? bloodType;
+  final List<String>? _allergies;
+  @override
+  List<String>? get allergies {
+    final value = _allergies;
+    if (value == null) return null;
+    if (_allergies is EqualUnmodifiableListView) return _allergies;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<String>? _conditions;
+  @override
+  List<String>? get conditions {
+    final value = _conditions;
+    if (value == null) return null;
+    if (_conditions is EqualUnmodifiableListView) return _conditions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<String>? _medications;
+  @override
+  List<String>? get medications {
+    final value = _medications;
+    if (value == null) return null;
+    if (_medications is EqualUnmodifiableListView) return _medications;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  final String? emergencyContactName;
+  @override
+  final String? emergencyContactPhone;
+  @override
+  final String? emergencyContactRelationship;
+  @override
   final String? createdAt;
+  @override
+  final String? updatedAt;
 
   @override
   String toString() {
-    return 'Profile(id: $id, email: $email, name: $name, avatarUrl: $avatarUrl, phone: $phone, createdAt: $createdAt)';
+    return 'Profile(id: $id, birthDate: $birthDate, gender: $gender, city: $city, phone: $phone, alias: $alias, stringId: $stringId, bloodType: $bloodType, allergies: $allergies, conditions: $conditions, medications: $medications, emergencyContactName: $emergencyContactName, emergencyContactPhone: $emergencyContactPhone, emergencyContactRelationship: $emergencyContactRelationship, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -215,19 +404,65 @@ class _$ProfileImpl extends _Profile {
         (other.runtimeType == runtimeType &&
             other is _$ProfileImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.avatarUrl, avatarUrl) ||
-                other.avatarUrl == avatarUrl) &&
+            (identical(other.birthDate, birthDate) ||
+                other.birthDate == birthDate) &&
+            (identical(other.gender, gender) || other.gender == gender) &&
+            (identical(other.city, city) || other.city == city) &&
             (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.alias, alias) || other.alias == alias) &&
+            (identical(other.stringId, stringId) ||
+                other.stringId == stringId) &&
+            (identical(other.bloodType, bloodType) ||
+                other.bloodType == bloodType) &&
+            const DeepCollectionEquality().equals(
+              other._allergies,
+              _allergies,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._conditions,
+              _conditions,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._medications,
+              _medications,
+            ) &&
+            (identical(other.emergencyContactName, emergencyContactName) ||
+                other.emergencyContactName == emergencyContactName) &&
+            (identical(other.emergencyContactPhone, emergencyContactPhone) ||
+                other.emergencyContactPhone == emergencyContactPhone) &&
+            (identical(
+                  other.emergencyContactRelationship,
+                  emergencyContactRelationship,
+                ) ||
+                other.emergencyContactRelationship ==
+                    emergencyContactRelationship) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, email, name, avatarUrl, phone, createdAt);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    birthDate,
+    gender,
+    city,
+    phone,
+    alias,
+    stringId,
+    bloodType,
+    const DeepCollectionEquality().hash(_allergies),
+    const DeepCollectionEquality().hash(_conditions),
+    const DeepCollectionEquality().hash(_medications),
+    emergencyContactName,
+    emergencyContactPhone,
+    emergencyContactRelationship,
+    createdAt,
+    updatedAt,
+  );
 
   /// Create a copy of Profile
   /// with the given fields replaced by the non-null parameter values.
@@ -246,11 +481,21 @@ class _$ProfileImpl extends _Profile {
 abstract class _Profile extends Profile {
   const factory _Profile({
     required final String id,
-    required final String email,
-    final String? name,
-    final String? avatarUrl,
+    final String? birthDate,
+    final String? gender,
+    final String? city,
     final String? phone,
+    final String? alias,
+    final String? stringId,
+    final String? bloodType,
+    final List<String>? allergies,
+    final List<String>? conditions,
+    final List<String>? medications,
+    final String? emergencyContactName,
+    final String? emergencyContactPhone,
+    final String? emergencyContactRelationship,
     final String? createdAt,
+    final String? updatedAt,
   }) = _$ProfileImpl;
   const _Profile._() : super._();
 
@@ -259,15 +504,35 @@ abstract class _Profile extends Profile {
   @override
   String get id;
   @override
-  String get email;
+  String? get birthDate;
   @override
-  String? get name;
+  String? get gender;
   @override
-  String? get avatarUrl;
+  String? get city;
   @override
   String? get phone;
   @override
+  String? get alias;
+  @override
+  String? get stringId;
+  @override
+  String? get bloodType;
+  @override
+  List<String>? get allergies;
+  @override
+  List<String>? get conditions;
+  @override
+  List<String>? get medications;
+  @override
+  String? get emergencyContactName;
+  @override
+  String? get emergencyContactPhone;
+  @override
+  String? get emergencyContactRelationship;
+  @override
   String? get createdAt;
+  @override
+  String? get updatedAt;
 
   /// Create a copy of Profile
   /// with the given fields replaced by the non-null parameter values.

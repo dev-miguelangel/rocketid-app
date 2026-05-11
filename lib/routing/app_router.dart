@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/application/session_state.dart';
-import '../features/splash/splash_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
+import '../features/dashboard/dashboard_screen.dart';
+import '../features/profile/profile_screen.dart';
+import '../features/splash/splash_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 import '../providers.dart';
 import 'router_refresh_stream.dart';
@@ -40,6 +42,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/inicio',
+        builder: (context, state) => const DashboardScreen(),
+      ),
+      GoRoute(
+        path: '/perfil',
+        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

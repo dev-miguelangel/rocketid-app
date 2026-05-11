@@ -9,12 +9,23 @@ class Profile with _$Profile {
 
   const factory Profile({
     required String id,
-    required String email,
-    String? name,
-    String? avatarUrl,
+    String? birthDate,
+    String? gender,
+    String? city,
     String? phone,
+    String? alias,
+    String? stringId,
+    String? bloodType,
+    List<String>? allergies,
+    List<String>? conditions,
+    List<String>? medications,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
+    String? emergencyContactRelationship,
     String? createdAt,
+    String? updatedAt,
   }) = _Profile;
 
-  factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
+  factory Profile.fromJson(Map<String, dynamic> json) =>
+      _$ProfileFromJson(json);
 }
