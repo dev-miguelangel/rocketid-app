@@ -24,7 +24,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -34,7 +34,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
   }
 
   Future<void> _openAddContactSheet() async {
-    final scaffold = ScaffoldMessenger.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     final added = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -45,7 +45,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
     if (added == true) {
       ref.invalidate(myContactsProvider);
       ref.invalidate(contactSuggestionsProvider);
-      scaffold
+      messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
@@ -83,8 +83,17 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
             child: TabBarView(
               controller: _tabController,
               children: const [
-                _ContactsTab(kind: _TabKind.myContacts),
-                _ContactsTab(kind: _TabKind.suggestions),
+                _ContactsTabView(),
+                _ComingSoonTab(
+                  icon: Icons.groups_outlined,
+                  title: 'Grupos',
+                  message: 'Pronto podrás organizar tus contactos en grupos.',
+                ),
+                _ComingSoonTab(
+                  icon: Icons.workspaces_outline,
+                  title: 'Equipos',
+                  message: 'Pronto podrás crear equipos y colaborar con otros.',
+                ),
               ],
             ),
           ),
@@ -122,36 +131,67 @@ class _TabsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceCard,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.borderSubtle),
-        ),
-        child: TabBar(
-          controller: controller,
-          dividerColor: Colors.transparent,
-          indicator: BoxDecoration(
-            color: AppColors.brandGreen,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          indicatorSize: TabBarIndicatorSize.tab,
-          labelColor: Colors.black,
-          unselectedLabelColor: AppColors.textMuted,
-          labelStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-          tabs: const [
-            Tab(text: 'Mis contactos'),
-            Tab(text: 'Sugerencias'),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: AppColors.scaffoldBg,
+        border: Border(bottom: BorderSide(color: AppColors.borderSubtle)),
+      ),
+      child: TabBar(
+        controller: controller,
+        dividerColor: Colors.transparent,
+        indicatorColor: AppColors.brandGreen,
+        indicatorWeight: 3,
+        indicatorSize: TabBarIndicatorSize.label,
+        labelColor: AppColors.brandGreen,
+        unselectedLabelColor: AppColors.textMuted,
+        labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+        unselectedLabelStyle:
+            const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        tabs: const [
+          Tab(text: 'Contactos'),
+          Tab(text: 'Grupos'),
+          Tab(text: 'Equipos'),
+        ],
+      ),
+    );
+  }
+}
+
+class _ComingSoonTab extends StatelessWidget {
+  const _ComingSoonTab({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 56, color: AppColors.textFaint),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+            ),
           ],
         ),
       ),
@@ -159,78 +199,465 @@ class _TabsHeader extends StatelessWidget {
   }
 }
 
-enum _TabKind { myContacts, suggestions }
-
-class _ContactsTab extends ConsumerWidget {
-  const _ContactsTab({required this.kind});
-
-  final _TabKind kind;
+class _ContactsTabView extends ConsumerStatefulWidget {
+  const _ContactsTabView();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncContacts = switch (kind) {
-      _TabKind.myContacts => ref.watch(myContactsProvider),
-      _TabKind.suggestions => ref.watch(contactSuggestionsProvider),
-    };
+  ConsumerState<_ContactsTabView> createState() => _ContactsTabViewState();
+}
 
-    return asyncContacts.when(
-      data: (list) => RefreshIndicator(
-        color: AppColors.brandGreen,
-        backgroundColor: AppColors.surfaceCard,
-        onRefresh: () async {
-          switch (kind) {
-            case _TabKind.myContacts:
-              ref.invalidate(myContactsProvider);
-              await ref.read(myContactsProvider.future);
-            case _TabKind.suggestions:
-              ref.invalidate(contactSuggestionsProvider);
-              await ref.read(contactSuggestionsProvider.future);
-          }
-        },
-        child: list.isEmpty
-            ? _EmptyState(kind: kind)
-            : ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-                itemCount: list.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (_, index) => _ContactTile(
-                  contact: list[index],
-                  showAddButton: kind == _TabKind.suggestions,
-                  onAdded: () {
-                    ref.invalidate(myContactsProvider);
-                    ref.invalidate(contactSuggestionsProvider);
-                  },
-                ),
-              ),
-      ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: AppColors.brandGreen),
-      ),
-      error: (err, _) => _ErrorState(
-        error: err,
-        onRetry: () {
-          switch (kind) {
-            case _TabKind.myContacts:
-              ref.invalidate(myContactsProvider);
-            case _TabKind.suggestions:
-              ref.invalidate(contactSuggestionsProvider);
-          }
-        },
+class _ContactsTabViewState extends ConsumerState<_ContactsTabView> {
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  bool _matches(Contact c) {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return true;
+    final fields = <String?>[
+      c.displayName,
+      c.email,
+      c.stringId,
+      c.alias,
+      c.city,
+    ];
+    for (final f in fields) {
+      if (f != null && f.toLowerCase().contains(q)) return true;
+    }
+    return false;
+  }
+
+  void _refreshAll() {
+    ref.invalidate(myContactsProvider);
+    ref.invalidate(contactSuggestionsProvider);
+  }
+
+  void _showSoon(String label) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('$label estará disponible pronto'),
+          backgroundColor: AppColors.surfaceCard,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final myContacts = ref.watch(myContactsProvider);
+    final suggestions = ref.watch(contactSuggestionsProvider);
+
+    return RefreshIndicator(
+      color: AppColors.brandGreen,
+      backgroundColor: AppColors.surfaceCard,
+      onRefresh: () async {
+        _refreshAll();
+        await Future.wait<void>([
+          ref.read(myContactsProvider.future),
+          ref.read(contactSuggestionsProvider.future),
+        ]);
+      },
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+        children: [
+          _SearchField(
+            controller: _searchController,
+            onChanged: (v) => setState(() => _query = v),
+          ),
+          const SizedBox(height: 16),
+          _InviteCard(onTap: () => _showSoon('Compartir por WhatsApp')),
+          const SizedBox(height: 24),
+          const _SectionLabel('MIS CONTACTOS'),
+          const SizedBox(height: 10),
+          _ContactsBlock(
+            value: myContacts,
+            filter: _matches,
+            empty: const _EmptyCard(
+              icon: Icons.groups_outlined,
+              title: 'Sin contactos aún',
+              subtitle:
+                  'Busca personas por nombre, correo o ID para agregarlas.',
+            ),
+            tile: (c) => _ContactTile(
+              contact: c,
+              kind: _TileKind.myContact,
+              onChanged: _refreshAll,
+            ),
+            onRetry: () => ref.invalidate(myContactsProvider),
+            noResults: 'Sin resultados en tus contactos.',
+          ),
+          const SizedBox(height: 24),
+          const _SectionLabel('SUGERENCIAS'),
+          const SizedBox(height: 10),
+          _ContactsBlock(
+            value: suggestions,
+            filter: _matches,
+            empty: const _EmptyCard(
+              icon: Icons.person_search_outlined,
+              title: 'No hay sugerencias por ahora',
+              subtitle: 'Vuelve más tarde para descubrir nuevas personas.',
+            ),
+            tile: (c) => _ContactTile(
+              contact: c,
+              kind: _TileKind.suggestion,
+              onChanged: _refreshAll,
+            ),
+            onRetry: () => ref.invalidate(contactSuggestionsProvider),
+            noResults: 'Sin sugerencias para esa búsqueda.',
+          ),
+        ],
       ),
     );
   }
 }
 
+class _ContactsBlock extends StatelessWidget {
+  const _ContactsBlock({
+    required this.value,
+    required this.filter,
+    required this.empty,
+    required this.tile,
+    required this.onRetry,
+    required this.noResults,
+  });
+
+  final AsyncValue<List<Contact>> value;
+  final bool Function(Contact) filter;
+  final Widget empty;
+  final Widget Function(Contact) tile;
+  final VoidCallback onRetry;
+  final String noResults;
+
+  @override
+  Widget build(BuildContext context) {
+    return value.when(
+      data: (list) {
+        if (list.isEmpty) return empty;
+        final filtered = list.where(filter).toList(growable: false);
+        if (filtered.isEmpty) {
+          return _InfoCard(icon: Icons.search_off, text: noResults);
+        }
+        return Column(
+          children: [
+            for (var i = 0; i < filtered.length; i++) ...[
+              if (i > 0) const SizedBox(height: 10),
+              tile(filtered[i]),
+            ],
+          ],
+        );
+      },
+      loading: () => const _LoadingCard(),
+      error: (err, _) => _InlineErrorCard(error: err, onRetry: onRetry),
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller, required this.onChanged});
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      textInputAction: TextInputAction.search,
+      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      decoration: InputDecoration(
+        hintText: 'Nombre, correo o ID...',
+        hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 15),
+        prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+        filled: true,
+        fillColor: AppColors.surfaceCard,
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.borderSubtle),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.brandGreen),
+        ),
+      ),
+    );
+  }
+}
+
+class _InviteCard extends StatelessWidget {
+  const _InviteCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0x1F34D399),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0x6634D399)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF25D366),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.chat, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Invitar a unirse',
+                      style: TextStyle(
+                        color: AppColors.brandGreen,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Comparte RocketId por WhatsApp',
+                      style:
+                          TextStyle(color: AppColors.textMuted, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: AppColors.textMuted),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 2),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: AppColors.textMuted,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyCard extends StatelessWidget {
+  const _EmptyCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 48, color: AppColors.textFaint),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 22, color: AppColors.textMuted),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoadingCard extends StatelessWidget {
+  const _LoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 28),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.6,
+            color: AppColors.brandGreen,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InlineErrorCard extends StatelessWidget {
+  const _InlineErrorCard({required this.error, required this.onRetry});
+
+  final Object error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(
+                Icons.error_outline,
+                color: AppColors.notificationDot,
+                size: 20,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'No pudimos cargar esta sección',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '$error',
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: onRetry,
+              child: const Text(
+                'Reintentar',
+                style: TextStyle(
+                  color: AppColors.brandGreen,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _TileKind { myContact, suggestion }
+
 class _ContactTile extends ConsumerStatefulWidget {
   const _ContactTile({
     required this.contact,
-    required this.showAddButton,
-    required this.onAdded,
+    required this.kind,
+    required this.onChanged,
   });
 
   final Contact contact;
-  final bool showAddButton;
-  final VoidCallback onAdded;
+  final _TileKind kind;
+  final VoidCallback onChanged;
 
   @override
   ConsumerState<_ContactTile> createState() => _ContactTileState();
@@ -249,7 +676,7 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
     try {
       await ref.read(contactsApiProvider).addContact(stringId);
       if (!mounted) return;
-      widget.onAdded();
+      widget.onChanged();
       _toast('Contacto agregado');
     } on DioException catch (e) {
       _toast(_dioMessage(e));
@@ -273,21 +700,22 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
       );
   }
 
+  void _openProfile() => _showContactProfileSheet(context, widget.contact);
+
   @override
   Widget build(BuildContext context) {
     final c = widget.contact;
     final subtitle = _subtitle(c);
+    final isSuggestion = widget.kind == _TileKind.suggestion;
 
-    return Container(
+    final content = Padding(
       padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceCard,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
       child: Row(
         children: [
-          _ContactAvatar(url: c.avatar, initial: c.initial),
+          GestureDetector(
+            onTap: _openProfile,
+            child: _ContactAvatar(url: c.avatar, initial: c.initial),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -316,12 +744,32 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
               ],
             ),
           ),
-          if (widget.showAddButton) ...[
+          if (isSuggestion) ...[
+            const SizedBox(width: 8),
+            _IconSquareButton(
+              icon: Icons.person_outline,
+              onTap: _openProfile,
+            ),
             const SizedBox(width: 8),
             _AddButton(saving: _saving, onPressed: _saving ? null : _add),
           ],
         ],
       ),
+    );
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: isSuggestion
+          ? content
+          : Material(
+              type: MaterialType.transparency,
+              child: InkWell(onTap: _openProfile, child: content),
+            ),
     );
   }
 
@@ -379,6 +827,35 @@ class _ContactAvatar extends StatelessWidget {
       );
 }
 
+class _IconSquareButton extends StatelessWidget {
+  const _IconSquareButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 40,
+      height: 40,
+      child: Material(
+        color: AppColors.surfaceChip,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: AppColors.borderChip),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Center(
+            child: Icon(icon, size: 18, color: AppColors.textSecondary),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _AddButton extends StatelessWidget {
   const _AddButton({required this.saving, required this.onPressed});
 
@@ -424,115 +901,341 @@ class _AddButton extends StatelessWidget {
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.kind});
+// ---------------------------------------------------------------------------
+// Contact profile sheet
+// ---------------------------------------------------------------------------
 
-  final _TabKind kind;
+Future<void> _showContactProfileSheet(BuildContext context, Contact contact) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _ContactProfileSheet(contact: contact),
+  );
+}
+
+class _ContactProfileSheet extends StatefulWidget {
+  const _ContactProfileSheet({required this.contact});
+
+  final Contact contact;
+
+  @override
+  State<_ContactProfileSheet> createState() => _ContactProfileSheetState();
+}
+
+class _ContactProfileSheetState extends State<_ContactProfileSheet> {
+  bool _showEmergency = false;
 
   @override
   Widget build(BuildContext context) {
-    final title = kind == _TabKind.myContacts
-        ? 'Aún no tienes contactos'
-        : 'No hay sugerencias por ahora';
-    final subtitle = kind == _TabKind.myContacts
-        ? 'Agrega a alguien usando su ID o desde Sugerencias.'
-        : 'Vuelve más tarde para descubrir nuevos contactos.';
-    final icon = kind == _TabKind.myContacts
-        ? Icons.people_outline
-        : Icons.person_search_outlined;
+    final media = MediaQuery.of(context);
+    final c = widget.contact;
+    final email = c.email;
+    final stringId = c.stringId;
 
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        const SizedBox(height: 80),
-        Icon(icon, size: 56, color: AppColors.textMuted),
-        const SizedBox(height: 16),
-        Text(
-          title,
-          textAlign: TextAlign.center,
+    return Container(
+      constraints: BoxConstraints(maxHeight: media.size.height * 0.88),
+      decoration: const BoxDecoration(
+        color: AppColors.scaffoldBg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 14, 8, 10),
+            child: Row(
+              children: [
+                const Text(
+                  'Perfil',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                ),
+              ],
+            ),
+          ),
+          const Divider(
+            height: 1,
+            thickness: 1,
+            color: AppColors.borderSubtle,
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(24, 28, 24, 28 + media.padding.bottom),
+              child: Column(
+                children: [
+                  _BigAvatar(url: c.avatar, initial: c.initial),
+                  const SizedBox(height: 18),
+                  Text(
+                    c.displayName,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  if (email != null && email.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      email,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  if (stringId != null && stringId.isNotEmpty) ...[
+                    _IdPill(stringId: stringId),
+                    const SizedBox(height: 16),
+                  ],
+                  _EmergencyButton(
+                    expanded: _showEmergency,
+                    onPressed: () =>
+                        setState(() => _showEmergency = !_showEmergency),
+                  ),
+                  if (_showEmergency) ...[
+                    const SizedBox(height: 12),
+                    _EmergencyPanel(contact: c),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BigAvatar extends StatelessWidget {
+  const _BigAvatar({required this.url, required this.initial});
+
+  final String? url;
+  final String initial;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 84,
+      height: 84,
+      decoration: BoxDecoration(
+        color: AppColors.brandGreen,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.borderChip, width: 3),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: url != null && url!.isNotEmpty
+          ? Image.network(
+              url!,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _initialChild(),
+              loadingBuilder: (_, child, progress) =>
+                  progress == null ? child : _initialChild(),
+            )
+          : _initialChild(),
+    );
+  }
+
+  Widget _initialChild() => Center(
+        child: Text(
+          initial,
           style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 16,
+            color: Colors.black,
+            fontSize: 34,
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 6),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 14,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+      );
 }
 
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.error, required this.onRetry});
+class _IdPill extends StatefulWidget {
+  const _IdPill({required this.stringId});
 
-  final Object error;
-  final VoidCallback onRetry;
+  final String stringId;
+
+  @override
+  State<_IdPill> createState() => _IdPillState();
+}
+
+class _IdPillState extends State<_IdPill> {
+  bool _copied = false;
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.stringId));
+    if (!mounted) return;
+    setState(() => _copied = true);
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    setState(() => _copied = false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        const SizedBox(height: 80),
-        const Icon(
-          Icons.error_outline,
-          color: AppColors.notificationDot,
-          size: 48,
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'No pudimos cargar los contactos',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Text(
-            '$error',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 13,
-            ),
-          ),
-        ),
-        const SizedBox(height: 18),
-        Center(
-          child: FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.brandGreen,
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+    return Material(
+      color: AppColors.surfaceChip,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.borderChip),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: _copy,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _copied ? Icons.check : Icons.badge_outlined,
+                size: 18,
+                color: AppColors.brandGreen,
               ),
-            ),
-            onPressed: onRetry,
-            child: const Text(
-              'Reintentar',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
+              const SizedBox(width: 10),
+              Text(
+                _copied ? 'Copiado' : widget.stringId,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
+
+class _EmergencyButton extends StatelessWidget {
+  const _EmergencyButton({required this.expanded, required this.onPressed});
+
+  final bool expanded;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.textSecondary,
+          side: const BorderSide(color: AppColors.borderChip),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: onPressed,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.emergency,
+              size: 20,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'Ver datos de emergencia',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              expanded ? Icons.expand_less : Icons.expand_more,
+              size: 20,
+              color: AppColors.textMuted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmergencyPanel extends StatelessWidget {
+  const _EmergencyPanel({required this.contact});
+
+  final Contact contact;
+
+  @override
+  Widget build(BuildContext context) {
+    final phone = contact.phone;
+    final hasPhone = phone != null && phone.isNotEmpty;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.info_outline, size: 18, color: AppColors.textMuted),
+              SizedBox(width: 8),
+              Text(
+                'Datos de emergencia',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (hasPhone) ...[
+            Row(
+              children: [
+                const Icon(
+                  Icons.phone_outlined,
+                  size: 16,
+                  color: AppColors.textMuted,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  phone,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+          Text(
+            hasPhone
+                ? 'Este contacto aún no comparte su información médica ni su contacto de emergencia.'
+                : 'Este contacto aún no comparte sus datos de emergencia.',
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Add contact sheet
+// ---------------------------------------------------------------------------
 
 class _AddContactSheet extends ConsumerStatefulWidget {
   const _AddContactSheet();
@@ -652,13 +1355,11 @@ class _AddContactSheetState extends ConsumerState<_AddContactSheet> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide:
-                      const BorderSide(color: AppColors.borderChip),
+                  borderSide: const BorderSide(color: AppColors.borderChip),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide:
-                      const BorderSide(color: AppColors.brandGreen),
+                  borderSide: const BorderSide(color: AppColors.brandGreen),
                 ),
               ),
             ),
