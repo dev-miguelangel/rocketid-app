@@ -7,6 +7,8 @@ import 'features/auth/application/session_repository.dart';
 import 'features/auth/application/session_state.dart';
 import 'features/auth/data/auth_api.dart';
 import 'features/auth/data/google_sign_in_service.dart';
+import 'features/contacts/data/contacts_api.dart';
+import 'features/contacts/domain/contact.dart';
 import 'features/profile/data/profile_api.dart';
 
 class LogoutHandler {
@@ -53,6 +55,20 @@ final authApiProvider = Provider<AuthApi>((ref) {
 final profileApiProvider = Provider<ProfileApi>((ref) {
   final dio = ref.watch(dioProvider);
   return ProfileApi(dio);
+});
+
+final contactsApiProvider = Provider<ContactsApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return ContactsApi(dio);
+});
+
+final myContactsProvider = FutureProvider.autoDispose<List<Contact>>((ref) {
+  return ref.watch(contactsApiProvider).getContacts();
+});
+
+final contactSuggestionsProvider =
+    FutureProvider.autoDispose<List<Contact>>((ref) {
+  return ref.watch(contactsApiProvider).getSuggestions();
 });
 
 final dioProvider = Provider<Dio>((ref) {

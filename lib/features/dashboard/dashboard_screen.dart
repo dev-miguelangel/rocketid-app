@@ -34,6 +34,10 @@ class DashboardScreen extends ConsumerWidget {
         currentIndex: 0,
         onTap: (i) {
           if (i == 0) return;
+          if (i == 3) {
+            context.push('/contactos');
+            return;
+          }
           if (i == 4) {
             context.push('/perfil');
             return;

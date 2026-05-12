@@ -54,6 +54,10 @@ class ProfileScreen extends ConsumerWidget {
             context.go('/inicio');
             return;
           }
+          if (i == 3) {
+            context.go('/contactos');
+            return;
+          }
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
@@ -99,32 +103,13 @@ class _ProfileBody extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
         _Header(user: user),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.brandGreen,
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            onPressed: user.profile == null
-                ? null
-                : () => context.push('/perfil/editar', extra: user),
-            icon: const Icon(Icons.edit, size: 18),
-            label: const Text(
-              'Editar perfil',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-            ),
-          ),
-        ),
         const SizedBox(height: 20),
         _Section(
           title: 'Información personal',
           icon: Icons.person_outline,
+          onEdit: user.profile == null
+              ? null
+              : () => context.push('/perfil/editar/personal', extra: user),
           rows: [
             _Row(
               icon: Icons.cake_outlined,
@@ -162,6 +147,9 @@ class _ProfileBody extends ConsumerWidget {
         _Section(
           title: 'Información médica',
           icon: Icons.medical_information_outlined,
+          onEdit: user.profile == null
+              ? null
+              : () => context.push('/perfil/editar/medica', extra: user),
           rows: [
             _Row(
               icon: Icons.bloodtype_outlined,
@@ -189,6 +177,9 @@ class _ProfileBody extends ConsumerWidget {
         _Section(
           title: 'Contacto de emergencia',
           icon: Icons.emergency_outlined,
+          onEdit: user.profile == null
+              ? null
+              : () => context.push('/perfil/editar/emergencia', extra: user),
           rows: [
             _Row(
               icon: Icons.person_outline,
@@ -377,16 +368,18 @@ class _Section extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.rows,
+    this.onEdit,
   });
 
   final String title;
   final IconData icon;
   final List<_Row> rows;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+      padding: const EdgeInsets.fromLTRB(18, 14, 8, 8),
       decoration: BoxDecoration(
         color: AppColors.surfaceCard,
         borderRadius: BorderRadius.circular(20),
@@ -399,18 +392,37 @@ class _Section extends StatelessWidget {
             children: [
               Icon(icon, color: AppColors.brandGreen, size: 20),
               const SizedBox(width: 10),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
+              if (onEdit != null)
+                IconButton(
+                  onPressed: onEdit,
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                    size: 18,
+                    color: AppColors.textMuted,
+                  ),
+                  tooltip: 'Editar',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                ),
             ],
           ),
           const SizedBox(height: 6),
-          for (final r in rows) r,
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Column(children: [for (final r in rows) r]),
+          ),
         ],
       ),
     );

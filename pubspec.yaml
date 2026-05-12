@@ -44,6 +44,9 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
 
+  # Native contact picker for emergency contact import.
+  flutter_contacts: ^2.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

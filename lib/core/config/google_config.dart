@@ -55,4 +55,11 @@ class AuthBackendConfig {
   /// Base path para mutaciones de Profile.
   /// `PATCH /profiles/:id` actualiza campos editables del profile.
   static const String profilesPath = '/profiles';
+
+  /// Endpoints de contactos (red social).
+  /// - `GET /profiles/contacts` lista los contactos del usuario.
+  /// - `GET /profiles/contacts/suggestions` lista sugerencias / seguidores.
+  /// - `POST /profiles/contacts/:stringId` agrega un contacto por stringId.
+  static const String contactsPath = '/profiles/contacts';
+  static const String contactSuggestionsPath = '/profiles/contacts/suggestions';
 }

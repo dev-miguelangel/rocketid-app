@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,10 +10,17 @@ import '../../shared/widgets/app_top_bar.dart';
 import '../auth/domain/user.dart';
 import 'profile_screen.dart';
 
+enum ProfileEditSection { personal, medical, emergency }
+
 class ProfileEditScreen extends ConsumerStatefulWidget {
-  const ProfileEditScreen({super.key, required this.user});
+  const ProfileEditScreen({
+    super.key,
+    required this.user,
+    required this.section,
+  });
 
   final User user;
+  final ProfileEditSection section;
 
   @override
   ConsumerState<ProfileEditScreen> createState() => _ProfileEditScreenState();
@@ -21,19 +29,24 @@ class ProfileEditScreen extends ConsumerStatefulWidget {
 class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  // Personal
   late final TextEditingController _city;
   late final TextEditingController _phone;
   late final TextEditingController _alias;
+  String? _birthDate;
+  String? _gender;
+
+  // Medical
   late final TextEditingController _allergies;
   late final TextEditingController _conditions;
   late final TextEditingController _medications;
+  String? _bloodType;
+
+  // Emergency
   late final TextEditingController _emergencyName;
   late final TextEditingController _emergencyPhone;
   late final TextEditingController _emergencyRel;
 
-  String? _birthDate;
-  String? _gender;
-  String? _bloodType;
   bool _saving = false;
 
   @override
@@ -43,20 +56,22 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     _city = TextEditingController(text: p?.city ?? '');
     _phone = TextEditingController(text: p?.phone ?? '');
     _alias = TextEditingController(text: p?.alias ?? '');
+    _birthDate = p?.birthDate;
+    _gender = p?.gender;
+
     _allergies =
         TextEditingController(text: (p?.allergies ?? const []).join(', '));
     _conditions = TextEditingController(text: p?.conditions ?? '');
     _medications =
         TextEditingController(text: (p?.medications ?? const []).join(', '));
+    _bloodType = p?.bloodType;
+
     _emergencyName =
         TextEditingController(text: p?.emergencyContactName ?? '');
     _emergencyPhone =
         TextEditingController(text: p?.emergencyContactPhone ?? '');
     _emergencyRel =
         TextEditingController(text: p?.emergencyContactRelationship ?? '');
-    _birthDate = p?.birthDate;
-    _gender = p?.gender;
-    _bloodType = p?.bloodType;
   }
 
   @override
@@ -72,6 +87,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     _emergencyRel.dispose();
     super.dispose();
   }
+
+  String get _title => switch (widget.section) {
+        ProfileEditSection.personal => 'Información personal',
+        ProfileEditSection.medical => 'Información médica',
+        ProfileEditSection.emergency => 'Contacto de emergencia',
+      };
 
   Future<void> _save() async {
     if (_saving) return;
@@ -92,7 +113,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       await ref.read(profileApiProvider).update(profileId, payload);
       ref.invalidate(meProvider);
       if (!mounted) return;
-      _toast('Perfil actualizado', success: true);
+      _toast('$_title actualizado', success: true);
       context.pop();
     } catch (e) {
       _toast('No se pudo actualizar: $e');
@@ -128,37 +149,40 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       }
     }
 
-    putIfChanged('city', p?.city, _city.text);
-    putIfChanged('phone', p?.phone, _phone.text);
-    putIfChanged('alias', p?.alias, _alias.text);
-    putIfChanged('conditions', p?.conditions, _conditions.text);
-    putIfChanged(
-      'emergencyContactName',
-      p?.emergencyContactName,
-      _emergencyName.text,
-    );
-    putIfChanged(
-      'emergencyContactPhone',
-      p?.emergencyContactPhone,
-      _emergencyPhone.text,
-    );
-    putIfChanged(
-      'emergencyContactRelationship',
-      p?.emergencyContactRelationship,
-      _emergencyRel.text,
-    );
-
-    putListIfChanged('allergies', p?.allergies, _allergies.text);
-    putListIfChanged('medications', p?.medications, _medications.text);
-
-    if (_birthDate != p?.birthDate && _birthDate != null) {
-      payload['birthDate'] = _birthDate;
-    }
-    if (_gender != p?.gender && _gender != null) {
-      payload['gender'] = _gender;
-    }
-    if (_bloodType != null && _bloodType != p?.bloodType) {
-      payload['bloodType'] = _bloodType;
+    switch (widget.section) {
+      case ProfileEditSection.personal:
+        putIfChanged('city', p?.city, _city.text);
+        putIfChanged('phone', p?.phone, _phone.text);
+        putIfChanged('alias', p?.alias, _alias.text);
+        if (_birthDate != p?.birthDate && _birthDate != null) {
+          payload['birthDate'] = _birthDate;
+        }
+        if (_gender != p?.gender && _gender != null) {
+          payload['gender'] = _gender;
+        }
+      case ProfileEditSection.medical:
+        putIfChanged('conditions', p?.conditions, _conditions.text);
+        putListIfChanged('allergies', p?.allergies, _allergies.text);
+        putListIfChanged('medications', p?.medications, _medications.text);
+        if (_bloodType != null && _bloodType != p?.bloodType) {
+          payload['bloodType'] = _bloodType;
+        }
+      case ProfileEditSection.emergency:
+        putIfChanged(
+          'emergencyContactName',
+          p?.emergencyContactName,
+          _emergencyName.text,
+        );
+        putIfChanged(
+          'emergencyContactPhone',
+          p?.emergencyContactPhone,
+          _emergencyPhone.text,
+        );
+        putIfChanged(
+          'emergencyContactRelationship',
+          p?.emergencyContactRelationship,
+          _emergencyRel.text,
+        );
     }
     return payload;
   }
@@ -168,6 +192,38 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       .map((s) => s.trim())
       .where((s) => s.isNotEmpty)
       .toList();
+
+  Future<void> _importFromContacts() async {
+    try {
+      final status =
+          await FlutterContacts.permissions.request(PermissionType.read);
+      if (status != PermissionStatus.granted &&
+          status != PermissionStatus.limited) {
+        _toast('Permiso de contactos denegado');
+        return;
+      }
+      final id = await FlutterContacts.native.showPicker();
+      if (id == null) return;
+      final contact = await FlutterContacts.get(
+        id,
+        properties: {ContactProperty.phone},
+      );
+      if (contact == null) return;
+      final name = contact.displayName ?? '';
+      final phone =
+          contact.phones.isNotEmpty ? contact.phones.first.number : '';
+      setState(() {
+        if (name.trim().isNotEmpty) {
+          _emergencyName.text = name;
+        }
+        if (phone.trim().isNotEmpty) {
+          _emergencyPhone.text = phone;
+        }
+      });
+    } catch (e) {
+      _toast('No se pudo abrir contactos: $e');
+    }
+  }
 
   void _toast(String message, {bool success = false}) {
     if (!mounted) return;
@@ -188,7 +244,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBg,
       appBar: AppTopBar.inner(
-        title: 'Editar perfil',
+        title: _title,
         onBack: () => context.pop(),
       ),
       body: AbsorbPointer(
@@ -198,103 +254,32 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
             children: [
-              _SectionCard(
-                title: 'Información personal',
-                icon: Icons.person_outline,
-                children: [
-                  _BirthDateField(
-                    value: _birthDate,
-                    onChanged: (v) => setState(() => _birthDate = v),
+              switch (widget.section) {
+                ProfileEditSection.personal => _PersonalSection(
+                    birthDate: _birthDate,
+                    gender: _gender,
+                    city: _city,
+                    phone: _phone,
+                    alias: _alias,
+                    onBirthDateChanged: (v) =>
+                        setState(() => _birthDate = v),
+                    onGenderChanged: (v) => setState(() => _gender = v),
                   ),
-                  _GenderField(
-                    value: _gender,
-                    onChanged: (v) => setState(() => _gender = v),
+                ProfileEditSection.medical => _MedicalSection(
+                    bloodType: _bloodType,
+                    allergies: _allergies,
+                    conditions: _conditions,
+                    medications: _medications,
+                    onBloodTypeChanged: (v) =>
+                        setState(() => _bloodType = v),
                   ),
-                  _Field(
-                    label: 'Ciudad',
-                    controller: _city,
-                    hint: 'Santiago',
-                    icon: Icons.location_city_outlined,
+                ProfileEditSection.emergency => _EmergencySection(
+                    name: _emergencyName,
+                    phone: _emergencyPhone,
+                    relationship: _emergencyRel,
+                    onImportFromContacts: _importFromContacts,
                   ),
-                  _Field(
-                    label: 'Teléfono',
-                    controller: _phone,
-                    hint: '+56912345678',
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s]')),
-                    ],
-                  ),
-                  _Field(
-                    label: 'Alias',
-                    controller: _alias,
-                    hint: 'miguelangel',
-                    icon: Icons.alternate_email,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _SectionCard(
-                title: 'Información médica',
-                icon: Icons.medical_information_outlined,
-                children: [
-                  _BloodTypeField(
-                    value: _bloodType,
-                    onChanged: (v) => setState(() => _bloodType = v),
-                  ),
-                  _Field(
-                    label: 'Alergias',
-                    controller: _allergies,
-                    hint: 'Penicilina, Polen',
-                    icon: Icons.coronavirus_outlined,
-                    helper: 'Separa con comas',
-                  ),
-                  _Field(
-                    label: 'Condiciones',
-                    controller: _conditions,
-                    hint: 'Hipertensión, Diabetes tipo 2',
-                    icon: Icons.healing_outlined,
-                    maxLines: 3,
-                  ),
-                  _Field(
-                    label: 'Medicamentos',
-                    controller: _medications,
-                    hint: 'Metformina 850mg, Losartán 50mg',
-                    icon: Icons.medication_outlined,
-                    helper: 'Separa con comas',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _SectionCard(
-                title: 'Contacto de emergencia',
-                icon: Icons.emergency_outlined,
-                children: [
-                  _Field(
-                    label: 'Nombre',
-                    controller: _emergencyName,
-                    hint: 'María González',
-                    icon: Icons.person_outline,
-                  ),
-                  _Field(
-                    label: 'Teléfono',
-                    controller: _emergencyPhone,
-                    hint: '+56987654321',
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s]')),
-                    ],
-                  ),
-                  _Field(
-                    label: 'Relación',
-                    controller: _emergencyRel,
-                    hint: 'Madre',
-                    icon: Icons.diversity_3_outlined,
-                  ),
-                ],
-              ),
+              },
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -340,6 +325,214 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _PersonalSection extends StatelessWidget {
+  const _PersonalSection({
+    required this.birthDate,
+    required this.gender,
+    required this.city,
+    required this.phone,
+    required this.alias,
+    required this.onBirthDateChanged,
+    required this.onGenderChanged,
+  });
+
+  final String? birthDate;
+  final String? gender;
+  final TextEditingController city;
+  final TextEditingController phone;
+  final TextEditingController alias;
+  final ValueChanged<String?> onBirthDateChanged;
+  final ValueChanged<String?> onGenderChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionCard(
+      title: 'Información personal',
+      icon: Icons.person_outline,
+      children: [
+        _BirthDateField(value: birthDate, onChanged: onBirthDateChanged),
+        _GenderField(value: gender, onChanged: onGenderChanged),
+        _Field(
+          label: 'Ciudad',
+          controller: city,
+          hint: 'Santiago',
+          icon: Icons.location_city_outlined,
+        ),
+        _Field(
+          label: 'Teléfono',
+          controller: phone,
+          hint: '+56912345678',
+          icon: Icons.phone_outlined,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s]')),
+          ],
+        ),
+        _Field(
+          label: 'Alias',
+          controller: alias,
+          hint: 'miguelangel',
+          icon: Icons.alternate_email,
+        ),
+      ],
+    );
+  }
+}
+
+class _MedicalSection extends StatelessWidget {
+  const _MedicalSection({
+    required this.bloodType,
+    required this.allergies,
+    required this.conditions,
+    required this.medications,
+    required this.onBloodTypeChanged,
+  });
+
+  final String? bloodType;
+  final TextEditingController allergies;
+  final TextEditingController conditions;
+  final TextEditingController medications;
+  final ValueChanged<String?> onBloodTypeChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionCard(
+      title: 'Información médica',
+      icon: Icons.medical_information_outlined,
+      children: [
+        _BloodTypeField(value: bloodType, onChanged: onBloodTypeChanged),
+        _Field(
+          label: 'Alergias',
+          controller: allergies,
+          hint: 'Penicilina, Polen',
+          icon: Icons.coronavirus_outlined,
+          helper: 'Separa con comas',
+        ),
+        _Field(
+          label: 'Condiciones',
+          controller: conditions,
+          hint: 'Hipertensión, Diabetes tipo 2',
+          icon: Icons.healing_outlined,
+          maxLines: 3,
+        ),
+        _Field(
+          label: 'Medicamentos',
+          controller: medications,
+          hint: 'Metformina 850mg, Losartán 50mg',
+          icon: Icons.medication_outlined,
+          helper: 'Separa con comas',
+        ),
+      ],
+    );
+  }
+}
+
+class _EmergencySection extends StatelessWidget {
+  const _EmergencySection({
+    required this.name,
+    required this.phone,
+    required this.relationship,
+    required this.onImportFromContacts,
+  });
+
+  final TextEditingController name;
+  final TextEditingController phone;
+  final TextEditingController relationship;
+  final VoidCallback onImportFromContacts;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionCard(
+      title: 'Contacto de emergencia',
+      icon: Icons.emergency_outlined,
+      children: [
+        InkWell(
+          onTap: onImportFromContacts,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.brandGreen.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.brandGreen.withValues(alpha: 0.4),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.brandGreen,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.contacts_outlined,
+                    color: Colors.black,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Importar desde contactos',
+                        style: TextStyle(
+                          color: AppColors.brandGreen,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Elige un contacto del teléfono',
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.brandGreen,
+                  size: 22,
+                ),
+              ],
+            ),
+          ),
+        ),
+        _Field(
+          label: 'Nombre',
+          controller: name,
+          hint: 'María González',
+          icon: Icons.person_outline,
+        ),
+        _Field(
+          label: 'Teléfono',
+          controller: phone,
+          hint: '+56987654321',
+          icon: Icons.phone_outlined,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s]')),
+          ],
+        ),
+        _Field(
+          label: 'Relación',
+          controller: relationship,
+          hint: 'Madre',
+          icon: Icons.diversity_3_outlined,
+        ),
+      ],
     );
   }
 }
@@ -422,7 +615,8 @@ class _Field extends StatelessWidget {
       maxLines: maxLines,
       style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
       cursorColor: AppColors.brandGreen,
-      decoration: _decoration(label: label, hint: hint, helper: helper, icon: icon),
+      decoration:
+          _decoration(label: label, hint: hint, helper: helper, icon: icon),
     );
   }
 }
@@ -435,8 +629,7 @@ class _BloodTypeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final validValue =
-        bloodTypeOptions.containsKey(value) ? value : null;
+    final validValue = bloodTypeOptions.containsKey(value) ? value : null;
 
     return DropdownButtonFormField<String>(
       initialValue: validValue,

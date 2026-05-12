@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/application/session_state.dart';
 import '../features/auth/presentation/login_screen.dart';
+import '../features/contacts/contacts_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/auth/domain/user.dart';
 import '../features/profile/profile_edit_screen.dart';
@@ -50,13 +51,33 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
+        path: '/contactos',
+        builder: (context, state) => const ContactsScreen(),
+      ),
+      GoRoute(
         path: '/perfil',
         builder: (context, state) => const ProfileScreen(),
         routes: [
           GoRoute(
-            path: 'editar',
-            builder: (context, state) =>
-                ProfileEditScreen(user: state.extra! as User),
+            path: 'editar/personal',
+            builder: (context, state) => ProfileEditScreen(
+              user: state.extra! as User,
+              section: ProfileEditSection.personal,
+            ),
+          ),
+          GoRoute(
+            path: 'editar/medica',
+            builder: (context, state) => ProfileEditScreen(
+              user: state.extra! as User,
+              section: ProfileEditSection.medical,
+            ),
+          ),
+          GoRoute(
+            path: 'editar/emergencia',
+            builder: (context, state) => ProfileEditScreen(
+              user: state.extra! as User,
+              section: ProfileEditSection.emergency,
+            ),
           ),
         ],
       ),
