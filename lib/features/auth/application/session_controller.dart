@@ -25,4 +25,11 @@ class SessionController extends StateNotifier<SessionState> {
     await _repository.logout();
     state = const SessionState.unauthenticated();
   }
+
+  Future<void> setOnboardingStep(int step) async {
+    final current = state;
+    if (current is! SessionAuthenticated) return;
+    final updated = await _repository.setOnboardingStep(step, current.user);
+    state = SessionState.authenticated(updated);
+  }
 }

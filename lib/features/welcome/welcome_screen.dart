@@ -1,16 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../providers.dart';
 import '../../shared/theme/app_colors.dart';
 import '../auth/application/session_state.dart';
 
-class WelcomeScreen extends ConsumerWidget {
+class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
+  bool _busy = false;
+
+  Future<void> _start() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await ref.read(sessionControllerProvider.notifier).setOnboardingStep(1);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('No se pudo continuar, intenta de nuevo')),
+        );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final sessionState = ref.watch(sessionControllerProvider);
     final firstName = switch (sessionState) {
       SessionAuthenticated(:final user) =>
@@ -96,26 +119,36 @@ class WelcomeScreen extends ConsumerWidget {
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                                onPressed: () => context.go('/inicio'),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Comencemos',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.black,
+                                onPressed: _busy ? null : _start,
+                                child: _busy
+                                    ? const SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.black,
+                                          strokeWidth: 2.4,
+                                        ),
+                                      )
+                                    : const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Comencemos',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w800,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Icon(
+                                            Icons.arrow_forward,
+                                            color: Colors.black,
+                                            size: 20,
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Icon(
-                                      Icons.arrow_forward,
-                                      color: Colors.black,
-                                      size: 20,
-                                    ),
-                                  ],
-                                ),
                               ),
                             ),
                           ],

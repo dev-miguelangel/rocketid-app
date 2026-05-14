@@ -21,7 +21,7 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Profile {
-  String get id => throw _privateConstructorUsedError;
+  String? get id => throw _privateConstructorUsedError;
   String? get birthDate => throw _privateConstructorUsedError;
   String? get gender => throw _privateConstructorUsedError;
   String? get city => throw _privateConstructorUsedError;
@@ -54,7 +54,7 @@ abstract class $ProfileCopyWith<$Res> {
       _$ProfileCopyWithImpl<$Res, Profile>;
   @useResult
   $Res call({
-    String id,
+    String? id,
     String? birthDate,
     String? gender,
     String? city,
@@ -88,7 +88,7 @@ class _$ProfileCopyWithImpl<$Res, $Val extends Profile>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? id = freezed,
     Object? birthDate = freezed,
     Object? gender = freezed,
     Object? city = freezed,
@@ -107,10 +107,10 @@ class _$ProfileCopyWithImpl<$Res, $Val extends Profile>
   }) {
     return _then(
       _value.copyWith(
-            id: null == id
+            id: freezed == id
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             birthDate: freezed == birthDate
                 ? _value.birthDate
                 : birthDate // ignore: cast_nullable_to_non_nullable
@@ -187,7 +187,7 @@ abstract class _$$ProfileImplCopyWith<$Res> implements $ProfileCopyWith<$Res> {
   @override
   @useResult
   $Res call({
-    String id,
+    String? id,
     String? birthDate,
     String? gender,
     String? city,
@@ -220,7 +220,7 @@ class __$$ProfileImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? id = freezed,
     Object? birthDate = freezed,
     Object? gender = freezed,
     Object? city = freezed,
@@ -239,10 +239,10 @@ class __$$ProfileImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$ProfileImpl(
-        id: null == id
+        id: freezed == id
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         birthDate: freezed == birthDate
             ? _value.birthDate
             : birthDate // ignore: cast_nullable_to_non_nullable
@@ -312,7 +312,7 @@ class __$$ProfileImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ProfileImpl extends _Profile {
   const _$ProfileImpl({
-    required this.id,
+    this.id,
     this.birthDate,
     this.gender,
     this.city,
@@ -336,7 +336,7 @@ class _$ProfileImpl extends _Profile {
       _$$ProfileImplFromJson(json);
 
   @override
-  final String id;
+  final String? id;
   @override
   final String? birthDate;
   @override
@@ -469,7 +469,7 @@ class _$ProfileImpl extends _Profile {
 
 abstract class _Profile extends Profile {
   const factory _Profile({
-    required final String id,
+    final String? id,
     final String? birthDate,
     final String? gender,
     final String? city,
@@ -491,7 +491,7 @@ abstract class _Profile extends Profile {
   factory _Profile.fromJson(Map<String, dynamic> json) = _$ProfileImpl.fromJson;
 
   @override
-  String get id;
+  String? get id;
   @override
   String? get birthDate;
   @override

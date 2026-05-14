@@ -18,6 +18,16 @@ class ContactsApi {
     return _parseList(response.data);
   }
 
+  Future<List<Contact>> searchProfiles(String query) async {
+    final q = query.trim();
+    if (q.isEmpty) return const [];
+    final response = await _dio.get(
+      AuthBackendConfig.profileSearchPath,
+      queryParameters: <String, dynamic>{'q': q},
+    );
+    return _parseList(response.data);
+  }
+
   Future<Contact?> addContact(String stringId) async {
     final id = stringId.trim();
     if (id.isEmpty) {

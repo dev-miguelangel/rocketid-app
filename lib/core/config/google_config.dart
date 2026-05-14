@@ -56,10 +56,40 @@ class AuthBackendConfig {
   /// `PATCH /profiles/:id` actualiza campos editables del profile.
   static const String profilesPath = '/profiles';
 
+  /// Endpoint para avanzar el onboarding del usuario autenticado.
+  /// `PATCH /users/onboarding` body `{ "onboardingStep": <int> }`.
+  static const String usersOnboardingPath = '/users/onboarding';
+
   /// Endpoints de contactos (red social).
   /// - `GET /profiles/contacts` lista los contactos del usuario.
   /// - `GET /profiles/contacts/suggestions` lista sugerencias / seguidores.
   /// - `POST /profiles/contacts/:stringId` agrega un contacto por stringId.
   static const String contactsPath = '/profiles/contacts';
   static const String contactSuggestionsPath = '/profiles/contacts/suggestions';
+
+  /// Búsqueda de personas por alias, stringId o correo.
+  /// `GET /profiles/search?q=<texto>`.
+  static const String profileSearchPath = '/profiles/search';
+
+  /// Grupos de contactos. El path es `/profiles/contact-groups` (no
+  /// `/profiles/groups`) para no colisionar con `GET /profiles/:id`.
+  /// - `POST /profiles/contact-groups` crea un grupo (nombre lowercase
+  ///   alfanumérico, máx 30 chars). `409` si el nombre ya existe para el usuario.
+  /// - `GET /profiles/contact-groups` lista los grupos del usuario.
+  /// - `GET /profiles/contact-groups/:id` obtiene un grupo con sus contactos.
+  /// - `PATCH /profiles/contact-groups/:id` renombra el grupo.
+  /// - `DELETE /profiles/contact-groups/:id` elimina el grupo.
+  /// - `POST /profiles/contact-groups/:id/contacts` agrega contactos al grupo.
+  /// - `DELETE /profiles/contact-groups/:id/contacts` remueve contactos.
+  static const String groupsPath = '/profiles/contact-groups';
+
+  /// Equipos. `GET/POST /teams`, `GET/PATCH/DELETE /teams/:id`,
+  /// `GET/POST /teams/:id/members`, `DELETE /teams/:id/members/:userId`,
+  /// `PATCH /teams/:id/members/:userId/role`, `POST /teams/:id/join`,
+  /// `POST /teams/:id/leave`, `GET /teams/:id/requests`,
+  /// `POST /teams/:id/requests/:userId/accept|reject`.
+  static const String teamsPath = '/teams';
+
+  /// Catálogo de deportes: `GET /sports`.
+  static const String sportsPath = '/sports';
 }

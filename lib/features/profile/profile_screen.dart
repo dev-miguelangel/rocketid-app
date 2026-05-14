@@ -13,15 +13,18 @@ final meProvider = FutureProvider.autoDispose<User>((ref) async {
   return authApi.me();
 });
 
+// La clave es el valor del enum BloodType del backend (lo que la API valida y
+// guarda, p. ej. "A+", "A-"); el valor del map es solo la etiqueta a mostrar.
 const bloodTypeOptions = <String, String>{
-  'O_POSITIVE': 'O+',
-  'O_NEGATIVE': 'O−',
-  'A_POSITIVE': 'A+',
-  'A_NEGATIVE': 'A−',
-  'B_POSITIVE': 'B+',
-  'B_NEGATIVE': 'B−',
-  'AB_POSITIVE': 'AB+',
-  'AB_NEGATIVE': 'AB−',
+  'O+': 'O+',
+  'O-': 'O−',
+  'A+': 'A+',
+  'A-': 'A−',
+  'B+': 'B+',
+  'B-': 'B−',
+  'AB+': 'AB+',
+  'AB-': 'AB−',
+  'sin informacion': 'sin informacion',
 };
 
 String? bloodTypeLabel(String? code) =>
@@ -82,8 +85,7 @@ class ProfileScreen extends ConsumerWidget {
         error: (err, _) => _ErrorState(
           error: err,
           onRetry: () => ref.invalidate(meProvider),
-          onLogout: () =>
-              ref.read(sessionControllerProvider.notifier).logout(),
+          onLogout: () => ref.read(sessionControllerProvider.notifier).logout(),
         ),
       ),
     );
@@ -327,15 +329,15 @@ class _Avatar extends StatelessWidget {
   }
 
   Widget _initialChild(String initial) => Center(
-        child: Text(
-          initial,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      );
+    child: Text(
+      initial,
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 26,
+        fontWeight: FontWeight.w800,
+      ),
+    ),
+  );
 }
 
 class _Tag extends StatelessWidget {
@@ -413,8 +415,10 @@ class _Section extends StatelessWidget {
                   tooltip: 'Editar',
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
                 ),
             ],
           ),
@@ -519,10 +523,7 @@ class _ErrorState extends StatelessWidget {
           Text(
             '$error',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 13,
-            ),
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
           ),
           const SizedBox(height: 20),
           FilledButton(

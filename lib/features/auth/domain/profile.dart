@@ -8,7 +8,7 @@ class Profile with _$Profile {
   const Profile._();
 
   const factory Profile({
-    required String id,
+    String? id,
     String? birthDate,
     String? gender,
     String? city,

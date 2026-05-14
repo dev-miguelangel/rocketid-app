@@ -7,9 +7,16 @@ import 'features/auth/application/session_repository.dart';
 import 'features/auth/application/session_state.dart';
 import 'features/auth/data/auth_api.dart';
 import 'features/auth/data/google_sign_in_service.dart';
+import 'features/auth/data/users_api.dart';
 import 'features/contacts/data/contacts_api.dart';
+import 'features/contacts/data/groups_api.dart';
 import 'features/contacts/domain/contact.dart';
+import 'features/contacts/domain/contact_group.dart';
 import 'features/profile/data/profile_api.dart';
+import 'features/teams/data/sports_api.dart';
+import 'features/teams/data/teams_api.dart';
+import 'features/teams/domain/sport.dart';
+import 'features/teams/domain/team.dart';
 
 class LogoutHandler {
   final Ref _ref;
@@ -37,6 +44,7 @@ final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
   return SessionRepository(
     googleSignInService: ref.watch(googleSignInServiceProvider),
     authApi: ref.watch(authApiProvider),
+    usersApi: ref.watch(usersApiProvider),
     secureStorage: ref.watch(secureStorageProvider),
   );
 });
@@ -50,6 +58,11 @@ final sessionControllerProvider =
 final authApiProvider = Provider<AuthApi>((ref) {
   final dio = ref.watch(dioProvider);
   return AuthApi(dio);
+});
+
+final usersApiProvider = Provider<UsersApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return UsersApi(dio);
 });
 
 final profileApiProvider = Provider<ProfileApi>((ref) {
@@ -69,6 +82,59 @@ final myContactsProvider = FutureProvider.autoDispose<List<Contact>>((ref) {
 final contactSuggestionsProvider =
     FutureProvider.autoDispose<List<Contact>>((ref) {
   return ref.watch(contactsApiProvider).getSuggestions();
+});
+
+final profileSearchProvider =
+    FutureProvider.autoDispose.family<List<Contact>, String>((ref, query) {
+  return ref.watch(contactsApiProvider).searchProfiles(query);
+});
+
+final groupsApiProvider = Provider<GroupsApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return GroupsApi(dio);
+});
+
+final contactGroupsProvider =
+    FutureProvider.autoDispose<List<ContactGroup>>((ref) {
+  return ref.watch(groupsApiProvider).list();
+});
+
+final groupDetailProvider =
+    FutureProvider.autoDispose.family<ContactGroup, String>((ref, id) {
+  return ref.watch(groupsApiProvider).getById(id);
+});
+
+final teamsApiProvider = Provider<TeamsApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return TeamsApi(dio);
+});
+
+final sportsApiProvider = Provider<SportsApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return SportsApi(dio);
+});
+
+final myTeamsProvider = FutureProvider.autoDispose<List<Team>>((ref) {
+  return ref.watch(teamsApiProvider).list();
+});
+
+final teamDetailProvider =
+    FutureProvider.autoDispose.family<Team, String>((ref, id) {
+  return ref.watch(teamsApiProvider).getById(id);
+});
+
+final teamMembersProvider =
+    FutureProvider.autoDispose.family<List<TeamMember>, String>((ref, id) {
+  return ref.watch(teamsApiProvider).members(id);
+});
+
+final teamRequestsProvider =
+    FutureProvider.autoDispose.family<List<TeamMember>, String>((ref, id) {
+  return ref.watch(teamsApiProvider).pendingRequests(id);
+});
+
+final sportsListProvider = FutureProvider.autoDispose<List<Sport>>((ref) {
+  return ref.watch(sportsApiProvider).list();
 });
 
 final dioProvider = Provider<Dio>((ref) {
