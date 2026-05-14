@@ -66,6 +66,18 @@ dev_dependencies:
   freezed: ^2.5.7
   json_serializable: ^6.8.0
 
+  # Generates Android (adaptive) and iOS launcher icons from a single source PNG.
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icon/icon_1024.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#6AD09D"
+  adaptive_icon_foreground: "assets/icon/icon_1024_foreground.png"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
