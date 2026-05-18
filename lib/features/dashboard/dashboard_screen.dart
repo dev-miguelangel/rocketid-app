@@ -68,37 +68,48 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-class _DashboardBody extends StatelessWidget {
+class _DashboardBody extends ConsumerWidget {
   const _DashboardBody();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final teamsAsync = ref.watch(myTeamsProvider);
+    final teamsCount = teamsAsync.asData?.value.length;
+    final teamsValue = teamsCount?.toString() ?? '—';
+    final teamsCaption = switch (teamsCount) {
+      null => 'cargando…',
+      0 => 'sin equipos',
+      1 => '1 equipo',
+      _ => 'equipos activos',
+    };
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: const [
+        children: [
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: _StatCard(
                   label: 'EVENTOS',
                   value: '0',
                   caption: 'este mes',
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: _StatCard(
                   label: 'EQUIPOS',
-                  value: '—',
-                  caption: 'sin equipos',
+                  value: teamsValue,
+                  caption: teamsCaption,
+                  onTap: () => context.push('/contactos?tab=equipos'),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
-          _ActivityCard(),
+          const SizedBox(height: 16),
+          const _ActivityCard(),
         ],
       ),
     );
@@ -110,15 +121,17 @@ class _StatCard extends StatelessWidget {
     required this.label,
     required this.value,
     required this.caption,
+    this.onTap,
   });
 
   final String label;
   final String value;
   final String caption;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final card = Container(
       height: 152,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -156,6 +169,18 @@ class _StatCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+
+    if (onTap == null) return card;
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: card,
       ),
     );
   }

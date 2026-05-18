@@ -15,6 +15,16 @@ class TeamsApi {
     return _parseTeamList(response.data);
   }
 
+  Future<List<Team>> search(String query) async {
+    final q = query.trim();
+    if (q.isEmpty) return const [];
+    final response = await _dio.get(
+      '$_base/search',
+      queryParameters: <String, dynamic>{'q': q},
+    );
+    return _parseTeamList(response.data);
+  }
+
   Future<Team> getById(String id) async {
     final response = await _dio.get('$_base/$id');
     return _parseTeam(response.data);

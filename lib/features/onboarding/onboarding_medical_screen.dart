@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers.dart';
 import '../../shared/theme/app_colors.dart';
@@ -72,11 +73,12 @@ class _OnboardingMedicalScreenState
     try {
       if (!skip) {
         final payload = _buildPayload();
-        if (payload.isNotEmpty && _profileId != null) {
+        if (_profileId != null && payload.isNotEmpty) {
           await ref.read(profileApiProvider).update(_profileId!, payload);
         }
       }
-      await ref.read(sessionControllerProvider.notifier).setOnboardingStep(4);
+      if (!mounted) return;
+      context.go('/onboarding/emergency');
     } catch (_) {
       _toast('No se pudo guardar la información');
     } finally {
@@ -107,8 +109,9 @@ class _OnboardingMedicalScreenState
       child: Column(
         children: [
           DropdownButtonFormField<String>(
-            initialValue:
-                bloodTypeOptions.containsKey(_bloodType) ? _bloodType : null,
+            initialValue: bloodTypeOptions.containsKey(_bloodType)
+                ? _bloodType
+                : null,
             isExpanded: true,
             dropdownColor: AppColors.surfaceCard,
             iconEnabledColor: AppColors.textMuted,

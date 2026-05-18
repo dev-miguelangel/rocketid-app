@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers.dart';
 import '../../shared/theme/app_colors.dart';
@@ -75,18 +77,50 @@ class _OnboardingEmergencyScreenState
     return p;
   }
 
+  Future<void> _importFromContacts() async {
+    if (_busy) return;
+    try {
+      final status =
+          await FlutterContacts.permissions.request(PermissionType.read);
+      if (status != PermissionStatus.granted &&
+          status != PermissionStatus.limited) {
+        _toast('Permiso de contactos denegado');
+        return;
+      }
+      final id = await FlutterContacts.native.showPicker();
+      if (id == null) return;
+      final contact = await FlutterContacts.get(
+        id,
+        properties: {ContactProperty.phone},
+      );
+      if (contact == null) return;
+      final name = contact.displayName ?? '';
+      final phone =
+          contact.phones.isNotEmpty ? contact.phones.first.number : '';
+      setState(() {
+        if (name.trim().isNotEmpty) _nameCtrl.text = name;
+        if (phone.trim().isNotEmpty) _phoneCtrl.text = phone;
+      });
+    } catch (e) {
+      _toast('No se pudo abrir contactos: $e');
+    }
+  }
+
   Future<void> _submit({required bool skip}) async {
     if (_busy) return;
     setState(() => _busy = true);
     try {
       if (!skip) {
         final payload = _buildPayload();
-        if (payload.isNotEmpty && _profileId != null) {
+        if (_profileId != null && payload.isNotEmpty) {
           await ref.read(profileApiProvider).update(_profileId!, payload);
         }
       }
-      await ref.read(sessionControllerProvider.notifier).setOnboardingStep(5);
-    } catch (_) {
+      await ref.read(sessionControllerProvider.notifier).setOnboardingStep(1);
+      if (!mounted) return;
+      context.go('/inicio');
+    } catch (e) {
+      debugPrint('Error completing onboarding: $e');
       _toast('No se pudo guardar la información');
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -109,12 +143,39 @@ class _OnboardingEmergencyScreenState
       subtitle:
           'Opcional. Tus contactos podrán llamarlo o escribirle desde tu perfil en caso de emergencia.',
       busy: _busy,
-      primaryLabel: 'Continuar',
+      primaryLabel: 'Finalizar',
       onPrimary: () => _submit(skip: false),
       secondaryLabel: 'Omitir por ahora',
       onSecondary: () => _submit(skip: true),
       child: Column(
         children: [
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _busy ? null : _importFromContacts,
+              icon: const Icon(
+                Icons.contacts_outlined,
+                color: AppColors.brandGreen,
+                size: 20,
+              ),
+              label: const Text(
+                'Importar de contactos',
+                style: TextStyle(
+                  color: AppColors.brandGreen,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: const BorderSide(color: AppColors.brandGreen),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
           TextFormField(
             controller: _nameCtrl,
             textCapitalization: TextCapitalization.words,

@@ -18,7 +18,10 @@ import 'domain/contact.dart';
 import 'domain/contact_group.dart';
 
 class ContactsScreen extends ConsumerStatefulWidget {
-  const ContactsScreen({super.key});
+  const ContactsScreen({super.key, this.initialTab = 0});
+
+  /// Pestaña inicial: 0 Contactos, 1 Grupos, 2 Equipos.
+  final int initialTab;
 
   @override
   ConsumerState<ContactsScreen> createState() => _ContactsScreenState();
@@ -27,12 +30,16 @@ class ContactsScreen extends ConsumerStatefulWidget {
 class _ContactsScreenState extends ConsumerState<ContactsScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  int _tabIndex = 0;
+  late int _tabIndex = widget.initialTab;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTab,
+    );
     _tabController.addListener(_handleTabChange);
   }
 
@@ -47,30 +54,6 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
     _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
-  }
-
-  Future<void> _openAddContactSheet() async {
-    final messenger = ScaffoldMessenger.of(context);
-    final added = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const _AddContactSheet(),
-    );
-    if (!mounted) return;
-    if (added == true) {
-      ref.invalidate(myContactsProvider);
-      ref.invalidate(contactSuggestionsProvider);
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(
-            content: Text('Contacto agregado'),
-            backgroundColor: AppColors.surfaceCard,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-    }
   }
 
   Future<void> _openCreateGroupSheet() async {
@@ -121,18 +104,6 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
 
   Widget? _buildFab() {
     switch (_tabIndex) {
-      case 0:
-        return FloatingActionButton.extended(
-          key: const ValueKey('fab-add-contact'),
-          onPressed: _openAddContactSheet,
-          backgroundColor: AppColors.brandGreen,
-          foregroundColor: Colors.black,
-          icon: const Icon(Icons.person_add_alt_1),
-          label: const Text(
-            'Agregar',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-        );
       case 1:
         return FloatingActionButton.extended(
           key: const ValueKey('fab-create-group'),
@@ -327,6 +298,9 @@ class _ContactsTabViewState extends ConsumerState<_ContactsTabView> {
     final partialQuery = !searching &&
         _query.trim().isNotEmpty &&
         _query.trim().length < _kSearchMinChars;
+    // IDs de personas que ya están en mis contactos: se omiten de los resultados.
+    final existingIds =
+        myContacts.asData?.value.map((c) => c.id).toSet() ?? <String>{};
 
     return RefreshIndicator(
       color: AppColors.brandGreen,
@@ -382,7 +356,9 @@ class _ContactsTabViewState extends ConsumerState<_ContactsTabView> {
           else
             _ContactsBlock(
               value: suggestions,
-              filter: searching ? (Contact _) => true : _matches,
+              filter: searching
+                  ? (Contact c) => !existingIds.contains(c.id)
+                  : _matches,
               empty: searching
                   ? _InfoCard(
                       icon: Icons.search_off,
@@ -787,6 +763,58 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
     }
   }
 
+  Future<void> _remove() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceCard,
+        title: const Text(
+          'Quitar contacto',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
+        content: Text(
+          '¿Quitar a ${widget.contact.displayName} de tus contactos?',
+          style: const TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text(
+              'Quitar',
+              style: TextStyle(color: AppColors.notificationDot),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final stringId = widget.contact.stringId;
+    if (stringId == null || stringId.isEmpty) {
+      _toast('Este contacto no tiene un ID disponible');
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      await ref.read(contactsApiProvider).removeContact(stringId);
+      if (!mounted) return;
+      widget.onChanged();
+      _toast('Contacto eliminado');
+    } on DioException catch (e) {
+      _toast(_dioMessage(e));
+    } catch (_) {
+      _toast('No pudimos quitar el contacto');
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   void _toast(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context)
@@ -852,6 +880,28 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
             ),
             const SizedBox(width: 8),
             _AddButton(saving: _saving, onPressed: _saving ? null : _add),
+          ] else ...[
+            const SizedBox(width: 8),
+            if (_saving)
+              const SizedBox(
+                width: 40,
+                height: 40,
+                child: Center(
+                  child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.4,
+                      color: AppColors.brandGreen,
+                    ),
+                  ),
+                ),
+              )
+            else
+              _IconSquareButton(
+                icon: Icons.person_remove_outlined,
+                onTap: _remove,
+              ),
           ],
         ],
       ),
@@ -1479,173 +1529,6 @@ class _InfoRow extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Add contact sheet
-// ---------------------------------------------------------------------------
-
-class _AddContactSheet extends ConsumerStatefulWidget {
-  const _AddContactSheet();
-
-  @override
-  ConsumerState<_AddContactSheet> createState() => _AddContactSheetState();
-}
-
-class _AddContactSheetState extends ConsumerState<_AddContactSheet> {
-  final _controller = TextEditingController();
-  bool _saving = false;
-  String? _errorText;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    final value = _controller.text.trim();
-    if (value.isEmpty) {
-      setState(() => _errorText = 'Ingresa un ID');
-      return;
-    }
-    setState(() {
-      _saving = true;
-      _errorText = null;
-    });
-    try {
-      await ref.read(contactsApiProvider).addContact(value);
-      if (!mounted) return;
-      Navigator.of(context).pop(true);
-    } on DioException catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _saving = false;
-        _errorText = _dioMessage(e);
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _saving = false;
-        _errorText = 'No pudimos agregar el contacto';
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: viewInsets),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceCard,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderChip,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Agregar contacto',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Escribe el ID público de la persona que quieres agregar.',
-              style: TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 13,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _controller,
-              autofocus: true,
-              enabled: !_saving,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _submit(),
-              inputFormatters: [
-                FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                LengthLimitingTextInputFormatter(40),
-              ],
-              style: const TextStyle(color: AppColors.textPrimary),
-              decoration: InputDecoration(
-                hintText: 'Ej: ABC123',
-                hintStyle: const TextStyle(color: AppColors.textFaint),
-                filled: true,
-                fillColor: AppColors.surfaceChip,
-                errorText: _errorText,
-                prefixIcon: const Icon(
-                  Icons.badge_outlined,
-                  color: AppColors.textMuted,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.borderChip),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.brandGreen),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 52,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.brandGreen,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                onPressed: _saving ? null : _submit,
-                child: _saving
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.6,
-                          color: Colors.black,
-                        ),
-                      )
-                    : const Text(
-                        'Agregar contacto',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

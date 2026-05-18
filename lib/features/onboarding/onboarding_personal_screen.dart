@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers.dart';
 import '../../shared/theme/app_colors.dart';
@@ -54,7 +55,7 @@ class _OnboardingPersonalScreenState
       _city != null &&
       _phoneCtrl.text.trim().isNotEmpty;
 
-  Future<void> _continue() async {
+  Future<void> _submit() async {
     if (_busy) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (!_isComplete || _profileId == null) return;
@@ -67,7 +68,8 @@ class _OnboardingPersonalScreenState
         'city': _city,
         'phone': _phoneCtrl.text.trim(),
       });
-      await ref.read(sessionControllerProvider.notifier).setOnboardingStep(3);
+      if (!mounted) return;
+      context.go('/onboarding/medical');
     } catch (_) {
       _toast('No se pudo guardar la información');
     } finally {
@@ -83,8 +85,7 @@ class _OnboardingPersonalScreenState
   }
 
   Future<void> _pickBirthDate() async {
-    final parsed =
-        _birthDate != null ? DateTime.tryParse(_birthDate!) : null;
+    final parsed = _birthDate != null ? DateTime.tryParse(_birthDate!) : null;
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
@@ -108,7 +109,8 @@ class _OnboardingPersonalScreenState
     );
     if (picked != null) {
       setState(() {
-        _birthDate = '${picked.year.toString().padLeft(4, '0')}-'
+        _birthDate =
+            '${picked.year.toString().padLeft(4, '0')}-'
             '${picked.month.toString().padLeft(2, '0')}-'
             '${picked.day.toString().padLeft(2, '0')}';
       });
@@ -126,7 +128,7 @@ class _OnboardingPersonalScreenState
       busy: _busy,
       primaryEnabled: _isComplete,
       primaryLabel: 'Continuar',
-      onPrimary: _continue,
+      onPrimary: _submit,
       child: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -159,8 +161,9 @@ class _OnboardingPersonalScreenState
                 icon: Icons.phone_outlined,
                 hint: '+56 9 1234 5678',
               ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Escribe tu teléfono' : null,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Escribe tu teléfono'
+                  : null,
             ),
           ],
         ),
@@ -189,17 +192,18 @@ class _BirthDateTile extends StatelessWidget {
           style: TextStyle(
             color: hasValue ? AppColors.textPrimary : AppColors.textFaint,
           ),
-          decoration: onboardingFieldDecoration(
-            label: 'Fecha de nacimiento',
-            icon: Icons.cake_outlined,
-            hint: 'YYYY-MM-DD',
-          ).copyWith(
-            suffixIcon: const Icon(
-              Icons.calendar_month_outlined,
-              color: AppColors.textMuted,
-              size: 20,
-            ),
-          ),
+          decoration:
+              onboardingFieldDecoration(
+                label: 'Fecha de nacimiento',
+                icon: Icons.cake_outlined,
+                hint: 'YYYY-MM-DD',
+              ).copyWith(
+                suffixIcon: const Icon(
+                  Icons.calendar_month_outlined,
+                  color: AppColors.textMuted,
+                  size: 20,
+                ),
+              ),
           validator: (_) => hasValue ? null : 'Selecciona tu fecha',
         ),
       ),
@@ -228,10 +232,7 @@ class _GenderDropdown extends StatelessWidget {
       ),
       items: [
         for (final entry in genderOptions.entries)
-          DropdownMenuItem<String>(
-            value: entry.key,
-            child: Text(entry.value),
-          ),
+          DropdownMenuItem<String>(value: entry.key, child: Text(entry.value)),
       ],
       onChanged: onChanged,
       validator: (v) => v == null ? 'Selecciona un género' : null,
@@ -247,31 +248,34 @@ class _CityDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final validValue =
-        kChileCitiesFlat.contains(value) ? value : null;
+    final validValue = kChileCitiesFlat.contains(value) ? value : null;
     final items = <DropdownMenuItem<String>>[];
     for (final entry in kChileCitiesByZone.entries) {
-      items.add(DropdownMenuItem<String>(
-        enabled: false,
-        value: '__zone_${entry.key}',
-        child: Text(
-          entry.key.toUpperCase(),
-          style: const TextStyle(
-            color: AppColors.textMuted,
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.1,
+      items.add(
+        DropdownMenuItem<String>(
+          enabled: false,
+          value: '__zone_${entry.key}',
+          child: Text(
+            entry.key.toUpperCase(),
+            style: const TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+            ),
           ),
         ),
-      ));
+      );
       for (final city in entry.value) {
-        items.add(DropdownMenuItem<String>(
-          value: city,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Text(city),
+        items.add(
+          DropdownMenuItem<String>(
+            value: city,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(city),
+            ),
           ),
-        ));
+        );
       }
     }
     return DropdownButtonFormField<String>(

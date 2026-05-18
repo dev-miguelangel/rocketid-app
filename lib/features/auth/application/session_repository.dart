@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import '../../../core/storage/secure_storage.dart';
 import '../data/auth_api.dart';
 import '../data/google_sign_in_service.dart';
@@ -54,7 +55,9 @@ class SessionRepository {
   }
 
   Future<User> setOnboardingStep(int step, User current) async {
+    developer.log('setOnboardingStep called with step: $step, current step: ${current.onboardingStep}');
     final newStep = await _usersApi.updateOnboardingStep(step);
+    developer.log('API returned newStep: $newStep');
     final merged = current.copyWith(onboardingStep: newStep);
     await _secureStorage.setUser(merged.toJson());
     return merged;

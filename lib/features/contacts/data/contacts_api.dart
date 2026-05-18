@@ -41,6 +41,14 @@ class ContactsApi {
     return null;
   }
 
+  Future<void> removeContact(String stringId) async {
+    final id = stringId.trim();
+    if (id.isEmpty) {
+      throw ArgumentError('stringId vacío');
+    }
+    await _dio.delete('${AuthBackendConfig.contactsPath}/$id');
+  }
+
   static List<Contact> _parseList(dynamic data) {
     final raw = data is Map<String, dynamic>
         ? (data['data'] ?? data['contacts'] ?? data['items'] ?? data)

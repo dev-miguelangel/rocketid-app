@@ -12,27 +12,15 @@ import '../features/onboarding/onboarding_personal_screen.dart';
 import '../features/profile/profile_edit_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/splash/splash_screen.dart';
-import '../features/welcome/welcome_screen.dart';
 import '../providers.dart';
 import 'router_refresh_stream.dart';
-
-String? _onboardingTarget(int? step) => switch (step ?? 0) {
-      0 => '/welcome',
-      1 => '/onboarding/alias',
-      2 => '/onboarding/personal',
-      3 => '/onboarding/medical',
-      4 => '/onboarding/emergency',
-      _ => null, // >= 5 → onboarding completado
-    };
 
 final routerProvider = Provider<GoRouter>((ref) {
   final sessionController = ref.watch(sessionControllerProvider.notifier);
 
   return GoRouter(
     initialLocation: '/splash',
-    refreshListenable: GoRouterRefreshStream(
-      sessionController.stream,
-    ),
+    refreshListenable: GoRouterRefreshStream(sessionController.stream),
     redirect: (context, state) {
       final session = ref.read(sessionControllerProvider);
       final location = state.matchedLocation;
@@ -40,18 +28,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       return switch (session) {
         SessionUnknown() => location == '/splash' ? null : '/splash',
         SessionAuthenticated(:final user) => () {
-            final target = _onboardingTarget(user.onboardingStep);
-            if (target == null) {
-              // Onboarding terminado: sacarlo del flujo de auth/onboarding.
-              final inAuthFlow = location == '/login' ||
-                  location == '/splash' ||
-                  location == '/welcome' ||
-                  location.startsWith('/onboarding/');
-              return inAuthFlow ? '/inicio' : null;
-            }
-            // Onboarding pendiente: forzar el paso correspondiente.
-            return location == target ? null : target;
-          }(),
+          final completed =
+              user.onboardingStep != null && user.onboardingStep != 0;
+          final inOnboarding = location.startsWith('/onboarding/');
+          if (completed) {
+            final inAuthFlow =
+                location == '/login' ||
+                location == '/splash' ||
+                inOnboarding;
+            return inAuthFlow ? '/inicio' : null;
+          }
+          return inOnboarding ? null : '/onboarding/alias';
+        }(),
         SessionUnauthenticated() when location == '/login' => null,
         _ => '/login',
       };
@@ -61,14 +49,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
       ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/welcome',
-        builder: (context, state) => const WelcomeScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/onboarding/alias',
         builder: (context, state) => const OnboardingAliasScreen(),
@@ -91,7 +72,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/contactos',
-        builder: (context, state) => const ContactsScreen(),
+        builder: (context, state) {
+          final tab = state.uri.queryParameters['tab'];
+          final initialTab = switch (tab) {
+            'grupos' => 1,
+            'equipos' => 2,
+            _ => 0,
+          };
+          return ContactsScreen(initialTab: initialTab);
+        },
       ),
       GoRoute(
         path: '/perfil',

@@ -118,6 +118,11 @@ final myTeamsProvider = FutureProvider.autoDispose<List<Team>>((ref) {
   return ref.watch(teamsApiProvider).list();
 });
 
+final teamSearchProvider =
+    FutureProvider.autoDispose.family<List<Team>, String>((ref, query) {
+  return ref.watch(teamsApiProvider).search(query);
+});
+
 final teamDetailProvider =
     FutureProvider.autoDispose.family<Team, String>((ref, id) {
   return ref.watch(teamsApiProvider).getById(id);
