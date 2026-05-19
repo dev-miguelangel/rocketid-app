@@ -11,13 +11,13 @@ InputDecoration onboardingFieldDecoration({
   return InputDecoration(
     labelText: label,
     hintText: hint,
-    labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-    floatingLabelStyle: const TextStyle(
+    labelStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
+    floatingLabelStyle: TextStyle(
       color: AppColors.brandGreen,
       fontSize: 14,
       fontWeight: FontWeight.w600,
     ),
-    hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 14),
+    hintStyle: TextStyle(color: AppColors.textFaint, fontSize: 14),
     prefixIcon: Icon(icon, color: AppColors.textMuted, size: 20),
     filled: true,
     fillColor: AppColors.surfaceChip,
@@ -25,19 +25,19 @@ InputDecoration onboardingFieldDecoration({
         const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.borderChip),
+      borderSide: BorderSide(color: AppColors.borderChip),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.borderChip),
+      borderSide: BorderSide(color: AppColors.borderChip),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.brandGreen),
+      borderSide: BorderSide(color: AppColors.brandGreen),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.notificationDot),
+      borderSide: BorderSide(color: AppColors.notificationDot),
     ),
   );
 }
@@ -89,7 +89,7 @@ class OnboardingScaffold extends StatelessWidget {
                 children: [
                   Text(
                     'Paso $step de $totalSteps',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textMuted,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -106,7 +106,7 @@ class OnboardingScaffold extends StatelessWidget {
                   value: progress,
                   minHeight: 6,
                   backgroundColor: AppColors.surfaceChip,
-                  valueColor: const AlwaysStoppedAnimation(AppColors.brandGreen),
+                  valueColor: AlwaysStoppedAnimation(AppColors.brandGreen),
                 ),
               ),
             ),
@@ -123,7 +123,7 @@ class OnboardingScaffold extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
@@ -133,7 +133,7 @@ class OnboardingScaffold extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 15,
                         height: 1.4,

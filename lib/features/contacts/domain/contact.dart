@@ -38,6 +38,7 @@ class Contact with _$Contact {
       'alias',
       'stringId',
       'birthDate',
+      'age',
       'gender',
       'bloodType',
       'allergies',
@@ -68,6 +69,7 @@ class Contact with _$Contact {
   String? get alias => profile?.alias;
   String? get stringId => profile?.stringId;
   String? get birthDate => profile?.birthDate;
+  int? get age => profile?.age;
   String? get gender => profile?.gender;
   String? get bloodType => profile?.bloodType;
   List<String>? get allergies => profile?.allergies;

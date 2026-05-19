@@ -1,16 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/application/session_state.dart';
+import '../features/activities/activity_detail_screen.dart';
+import '../features/activities/agenda_screen.dart';
+import '../features/activities/presentation/create_activity_screen.dart';
+import '../features/activities/presentation/subteam_board_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/contacts/contacts_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/auth/domain/user.dart';
 import '../features/onboarding/onboarding_alias_screen.dart';
+import '../features/pending_actions/pending_actions_screen.dart';
 import '../features/onboarding/onboarding_emergency_screen.dart';
 import '../features/onboarding/onboarding_medical_screen.dart';
 import '../features/onboarding/onboarding_personal_screen.dart';
 import '../features/profile/profile_edit_screen.dart';
 import '../features/profile/profile_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
 import '../features/splash/splash_screen.dart';
 import '../providers.dart';
 import 'router_refresh_stream.dart';
@@ -71,6 +77,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
+        path: '/agenda',
+        builder: (context, state) => const AgendaScreen(),
+      ),
+      GoRoute(
+        path: '/pendientes',
+        builder: (context, state) => const PendingActionsScreen(),
+      ),
+      GoRoute(
+        path: '/agenda/crear',
+        builder: (context, state) => const CreateActivityScreen(),
+      ),
+      GoRoute(
+        path: '/agenda/:id',
+        builder: (context, state) => ActivityDetailScreen(
+          activityId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/agenda/:id/equipos',
+        builder: (context, state) => SubteamBoardScreen(
+          activityId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
         path: '/contactos',
         builder: (context, state) {
           final tab = state.uri.queryParameters['tab'];
@@ -106,6 +136,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               user: state.extra! as User,
               section: ProfileEditSection.emergency,
             ),
+          ),
+          GoRoute(
+            path: 'ajustes',
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
       ),

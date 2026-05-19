@@ -8,11 +8,20 @@ import 'features/auth/application/session_state.dart';
 import 'features/auth/data/auth_api.dart';
 import 'features/auth/data/google_sign_in_service.dart';
 import 'features/auth/data/users_api.dart';
+import 'features/activities/data/activities_api.dart';
+import 'features/activities/data/geocoding_service.dart';
+import 'features/activities/domain/activity.dart';
+import 'features/activities/domain/activity_filter.dart';
+import 'features/activities/domain/activity_participant.dart';
 import 'features/contacts/data/contacts_api.dart';
+import 'features/pending_actions/data/pending_actions_api.dart';
+import 'features/pending_actions/domain/pending_action.dart';
 import 'features/contacts/data/groups_api.dart';
 import 'features/contacts/domain/contact.dart';
 import 'features/contacts/domain/contact_group.dart';
 import 'features/profile/data/profile_api.dart';
+import 'features/settings/application/theme_controller.dart';
+import 'shared/theme/app_palette.dart';
 import 'features/teams/data/sports_api.dart';
 import 'features/teams/data/teams_api.dart';
 import 'features/teams/domain/sport.dart';
@@ -34,6 +43,16 @@ final secureStorageProvider = Provider<SecureStorage>((ref) {
 
 final googleSignInServiceProvider = Provider<GoogleSignInService>((ref) {
   return GoogleSignInService();
+});
+
+/// Estilo de color activo. `main` sobrescribe este provider con la paleta
+/// persistida; sin override usa `emerald` (primer arranque / tests).
+final themeControllerProvider =
+    StateNotifierProvider<ThemeController, AppPaletteId>((ref) {
+  return ThemeController(
+    ref.watch(secureStorageProvider),
+    AppPaletteId.emerald,
+  );
 });
 
 final logoutHandlerProvider = Provider<LogoutHandler>((ref) {
@@ -140,6 +159,54 @@ final teamRequestsProvider =
 
 final sportsListProvider = FutureProvider.autoDispose<List<Sport>>((ref) {
   return ref.watch(sportsApiProvider).list();
+});
+
+// --- Actividades -------------------------------------------------------------
+
+final activitiesApiProvider = Provider<ActivitiesApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return ActivitiesApi(dio);
+});
+
+/// Geocodificación de direcciones (Nominatim / OpenStreetMap).
+final geocodingServiceProvider = Provider<GeocodingService>((ref) {
+  return GeocodingService();
+});
+
+/// Agenda de actividades (`GET /activities`) según un filtro.
+final agendaProvider = FutureProvider.autoDispose
+    .family<List<Activity>, ActivityFilter>((ref, filter) {
+  return ref.watch(activitiesApiProvider).list(filter);
+});
+
+/// Actividades que el usuario organiza o en las que participa.
+final myActivitiesProvider = FutureProvider.autoDispose<List<Activity>>((ref) {
+  return ref.watch(activitiesApiProvider).mine();
+});
+
+/// Detalle de una actividad por id.
+final activityDetailProvider =
+    FutureProvider.autoDispose.family<Activity, String>((ref, id) {
+  return ref.watch(activitiesApiProvider).getById(id);
+});
+
+/// Participantes de una actividad por id.
+final activityParticipantsProvider = FutureProvider.autoDispose
+    .family<List<ActivityParticipant>, String>((ref, id) {
+  return ref.watch(activitiesApiProvider).participants(id);
+});
+
+// --- Acciones pendientes -----------------------------------------------------
+
+final pendingActionsApiProvider = Provider<PendingActionsApi>((ref) {
+  final dio = ref.watch(dioProvider);
+  return PendingActionsApi(dio);
+});
+
+/// Inbox de acciones pendientes (`GET /pending-actions`).
+final pendingActionsProvider =
+    FutureProvider.autoDispose<PendingActionsInbox>((ref) {
+  return ref.watch(pendingActionsApiProvider).inbox();
 });
 
 final dioProvider = Provider<Dio>((ref) {

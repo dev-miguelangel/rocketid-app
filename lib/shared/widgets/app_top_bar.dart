@@ -59,7 +59,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.scaffoldBg,
         border: Border(
           bottom: BorderSide(color: AppColors.borderSubtle),
@@ -120,7 +120,7 @@ class _DashboardRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const Text(
+        Text(
           'RocketId',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -176,7 +176,7 @@ class _BellButton extends StatelessWidget {
           IconButton(
             onPressed: onTap,
             padding: EdgeInsets.zero,
-            icon: const Icon(
+            icon: Icon(
               Icons.notifications_outlined,
               color: AppColors.textPrimary,
               size: 26,
@@ -202,7 +202,7 @@ class _NotificationDot extends StatelessWidget {
     return Container(
       width: 8,
       height: 8,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.notificationDot,
         shape: BoxShape.circle,
       ),
@@ -232,7 +232,7 @@ class _InnerRow extends StatelessWidget {
               border: Border.all(color: AppColors.borderChip),
             ),
             alignment: Alignment.center,
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back,
               color: AppColors.textPrimary,
               size: 22,
@@ -243,7 +243,7 @@ class _InnerRow extends StatelessWidget {
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.w800,

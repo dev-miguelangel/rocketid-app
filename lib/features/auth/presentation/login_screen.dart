@@ -42,7 +42,7 @@ class LoginScreen extends ConsumerWidget {
                     children: [
                       const _LogoBadge(),
                       const SizedBox(height: 24),
-                      const Text(
+                      Text(
                         'RocketId',
                         style: TextStyle(
                           fontSize: 34,
@@ -52,7 +52,7 @@ class LoginScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Gestiona tus eventos deportivos',
                         style: TextStyle(
                           fontSize: 16,
@@ -124,7 +124,7 @@ class LoginScreen extends ConsumerWidget {
                                     ),
                                   ),
                             const SizedBox(height: 16),
-                            const Text.rich(
+                            Text.rich(
                               TextSpan(
                                 style: TextStyle(
                                   color: AppColors.textFaint,
@@ -148,7 +148,7 @@ class LoginScreen extends ConsumerWidget {
                       ),
                       if (sessionState is SessionAuthenticated) ...[
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           'Ya has iniciado sesión',
                           style: TextStyle(color: AppColors.textMuted),
                         ),
@@ -250,7 +250,7 @@ class _SportChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             sport.label,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14,
               fontWeight: FontWeight.w500,

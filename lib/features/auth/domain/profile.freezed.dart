@@ -22,7 +22,10 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Profile {
   String? get id => throw _privateConstructorUsedError;
-  String? get birthDate => throw _privateConstructorUsedError;
+  String? get birthDate =>
+      throw _privateConstructorUsedError; // Edad calculada por el backend a partir de `birthDate`. `null` si no hay
+  // fecha de nacimiento; entero con los años cumplidos en caso contrario.
+  int? get age => throw _privateConstructorUsedError;
   String? get gender => throw _privateConstructorUsedError;
   String? get city => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
@@ -56,6 +59,7 @@ abstract class $ProfileCopyWith<$Res> {
   $Res call({
     String? id,
     String? birthDate,
+    int? age,
     String? gender,
     String? city,
     String? phone,
@@ -90,6 +94,7 @@ class _$ProfileCopyWithImpl<$Res, $Val extends Profile>
   $Res call({
     Object? id = freezed,
     Object? birthDate = freezed,
+    Object? age = freezed,
     Object? gender = freezed,
     Object? city = freezed,
     Object? phone = freezed,
@@ -115,6 +120,10 @@ class _$ProfileCopyWithImpl<$Res, $Val extends Profile>
                 ? _value.birthDate
                 : birthDate // ignore: cast_nullable_to_non_nullable
                       as String?,
+            age: freezed == age
+                ? _value.age
+                : age // ignore: cast_nullable_to_non_nullable
+                      as int?,
             gender: freezed == gender
                 ? _value.gender
                 : gender // ignore: cast_nullable_to_non_nullable
@@ -189,6 +198,7 @@ abstract class _$$ProfileImplCopyWith<$Res> implements $ProfileCopyWith<$Res> {
   $Res call({
     String? id,
     String? birthDate,
+    int? age,
     String? gender,
     String? city,
     String? phone,
@@ -222,6 +232,7 @@ class __$$ProfileImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? birthDate = freezed,
+    Object? age = freezed,
     Object? gender = freezed,
     Object? city = freezed,
     Object? phone = freezed,
@@ -247,6 +258,10 @@ class __$$ProfileImplCopyWithImpl<$Res>
             ? _value.birthDate
             : birthDate // ignore: cast_nullable_to_non_nullable
                   as String?,
+        age: freezed == age
+            ? _value.age
+            : age // ignore: cast_nullable_to_non_nullable
+                  as int?,
         gender: freezed == gender
             ? _value.gender
             : gender // ignore: cast_nullable_to_non_nullable
@@ -314,6 +329,7 @@ class _$ProfileImpl extends _Profile {
   const _$ProfileImpl({
     this.id,
     this.birthDate,
+    this.age,
     this.gender,
     this.city,
     this.phone,
@@ -339,6 +355,10 @@ class _$ProfileImpl extends _Profile {
   final String? id;
   @override
   final String? birthDate;
+  // Edad calculada por el backend a partir de `birthDate`. `null` si no hay
+  // fecha de nacimiento; entero con los años cumplidos en caso contrario.
+  @override
+  final int? age;
   @override
   final String? gender;
   @override
@@ -386,7 +406,7 @@ class _$ProfileImpl extends _Profile {
 
   @override
   String toString() {
-    return 'Profile(id: $id, birthDate: $birthDate, gender: $gender, city: $city, phone: $phone, alias: $alias, stringId: $stringId, bloodType: $bloodType, allergies: $allergies, conditions: $conditions, medications: $medications, emergencyContactName: $emergencyContactName, emergencyContactPhone: $emergencyContactPhone, emergencyContactRelationship: $emergencyContactRelationship, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Profile(id: $id, birthDate: $birthDate, age: $age, gender: $gender, city: $city, phone: $phone, alias: $alias, stringId: $stringId, bloodType: $bloodType, allergies: $allergies, conditions: $conditions, medications: $medications, emergencyContactName: $emergencyContactName, emergencyContactPhone: $emergencyContactPhone, emergencyContactRelationship: $emergencyContactRelationship, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -397,6 +417,7 @@ class _$ProfileImpl extends _Profile {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.birthDate, birthDate) ||
                 other.birthDate == birthDate) &&
+            (identical(other.age, age) || other.age == age) &&
             (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.city, city) || other.city == city) &&
             (identical(other.phone, phone) || other.phone == phone) &&
@@ -437,6 +458,7 @@ class _$ProfileImpl extends _Profile {
     runtimeType,
     id,
     birthDate,
+    age,
     gender,
     city,
     phone,
@@ -471,6 +493,7 @@ abstract class _Profile extends Profile {
   const factory _Profile({
     final String? id,
     final String? birthDate,
+    final int? age,
     final String? gender,
     final String? city,
     final String? phone,
@@ -493,7 +516,10 @@ abstract class _Profile extends Profile {
   @override
   String? get id;
   @override
-  String? get birthDate;
+  String? get birthDate; // Edad calculada por el backend a partir de `birthDate`. `null` si no hay
+  // fecha de nacimiento; entero con los años cumplidos en caso contrario.
+  @override
+  int? get age;
   @override
   String? get gender;
   @override

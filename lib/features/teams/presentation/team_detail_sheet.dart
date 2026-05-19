@@ -53,19 +53,19 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.surfaceCard,
-        title: Text(title, style: const TextStyle(color: AppColors.textPrimary)),
+        title: Text(title, style: TextStyle(color: AppColors.textPrimary)),
         content:
-            Text(message, style: const TextStyle(color: AppColors.textMuted)),
+            Text(message, style: TextStyle(color: AppColors.textMuted)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar',
+            child: Text('Cancelar',
                 style: TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(action,
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.notificationDot,
                     fontWeight: FontWeight.w700)),
           ),
@@ -257,7 +257,7 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
       },
       child: Container(
         constraints: BoxConstraints(maxHeight: media.size.height * 0.92),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.scaffoldBg,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -278,7 +278,7 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
                   Expanded(
                     child: Text(
                       team?.name ?? 'Equipo',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 19,
                         fontWeight: FontWeight.w800,
@@ -290,18 +290,18 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
                     IconButton(
                       tooltip: 'Editar equipo',
                       onPressed: _busy ? null : () => _edit(team),
-                      icon: const Icon(Icons.edit_outlined,
+                      icon: Icon(Icons.edit_outlined,
                           color: AppColors.textMuted),
                     ),
                   IconButton(
                     onPressed: () => Navigator.of(context)
                         .pop(_result.isEmpty ? null : _result),
-                    icon: const Icon(Icons.close, color: AppColors.textMuted),
+                    icon: Icon(Icons.close, color: AppColors.textMuted),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, thickness: 1, color: AppColors.borderSubtle),
+            Divider(height: 1, thickness: 1, color: AppColors.borderSubtle),
             Flexible(
               child: detailAsync.when(
                 data: (t) => _buildBody(
@@ -314,7 +314,7 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
                   myId: myId,
                   bottomInset: media.padding.bottom,
                 ),
-                loading: () => const Padding(
+                loading: () => Padding(
                   padding: EdgeInsets.symmetric(vertical: 56),
                   child: Center(
                     child: CircularProgressIndicator(color: AppColors.brandGreen),
@@ -365,7 +365,7 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
         const SizedBox(height: 14),
         Text(
           team.description!,
-          style: const TextStyle(color: AppColors.textSoft, fontSize: 14, height: 1.4),
+          style: TextStyle(color: AppColors.textSoft, fontSize: 14, height: 1.4),
         ),
       ],
       const SizedBox(height: 20),
@@ -381,7 +381,7 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
           child: OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.brandGreen,
-              side: const BorderSide(color: AppColors.borderChip),
+              side: BorderSide(color: AppColors.borderChip),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -448,7 +448,7 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
         child: OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.notificationDot,
-            side: const BorderSide(color: AppColors.borderChip),
+            side: BorderSide(color: AppColors.borderChip),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
@@ -466,7 +466,7 @@ class _TeamDetailSheetState extends ConsumerState<TeamDetailSheet> {
         child: OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.notificationDot,
-            side: const BorderSide(color: AppColors.borderChip),
+            side: BorderSide(color: AppColors.borderChip),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
@@ -507,7 +507,7 @@ class _Chip extends StatelessWidget {
           Icon(icon, size: 15, color: AppColors.textMuted),
           const SizedBox(width: 6),
           Text(text,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
         ],
       ),
     );
@@ -556,7 +556,7 @@ class _MemberTile extends StatelessWidget {
                       Flexible(
                         child: Text(
                           c.displayName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -572,7 +572,7 @@ class _MemberTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: AppColors.textMuted, fontSize: 13),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -584,7 +584,7 @@ class _MemberTile extends StatelessWidget {
               PopupMenuButton<String>(
                 enabled: !busy,
                 color: AppColors.surfaceCard,
-                icon: const Icon(Icons.more_vert, color: AppColors.textMuted),
+                icon: Icon(Icons.more_vert, color: AppColors.textMuted),
                 onSelected: (v) {
                   switch (v) {
                     case 'captain':
@@ -597,18 +597,18 @@ class _MemberTile extends StatelessWidget {
                 },
                 itemBuilder: (_) => [
                   if (member.role != 'captain')
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'captain',
                       child: Text('Hacer capitán',
                           style: TextStyle(color: AppColors.textPrimary)),
                     ),
                   if (member.role == 'captain')
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'member',
                       child: Text('Hacer miembro',
                           style: TextStyle(color: AppColors.textPrimary)),
                     ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'remove',
                     child: Text('Quitar del equipo',
                         style: TextStyle(color: AppColors.notificationDot)),
@@ -706,7 +706,7 @@ class _RequestTile extends StatelessWidget {
                 children: [
                   Text(
                     c.displayName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -717,7 +717,7 @@ class _RequestTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: AppColors.textMuted, fontSize: 13),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -728,12 +728,12 @@ class _RequestTile extends StatelessWidget {
             IconButton(
               tooltip: 'Rechazar',
               onPressed: busy ? null : onReject,
-              icon: const Icon(Icons.close, color: AppColors.notificationDot),
+              icon: Icon(Icons.close, color: AppColors.notificationDot),
             ),
             IconButton(
               tooltip: 'Aceptar',
               onPressed: busy ? null : onAccept,
-              icon: const Icon(Icons.check, color: AppColors.brandGreen),
+              icon: Icon(Icons.check, color: AppColors.brandGreen),
             ),
           ],
         ),
@@ -867,7 +867,7 @@ class _AddTeamMemberSheetState extends ConsumerState<_AddTeamMemberSheet> {
       padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
       child: Container(
         constraints: BoxConstraints(maxHeight: media.size.height * 0.85),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.scaffoldBg,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -885,7 +885,7 @@ class _AddTeamMemberSheetState extends ConsumerState<_AddTeamMemberSheet> {
                 ),
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(20, 14, 20, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
@@ -955,7 +955,7 @@ class _AddTeamMemberSheetState extends ConsumerState<_AddTeamMemberSheet> {
                     },
                   );
                 },
-                loading: () => const Padding(
+                loading: () => Padding(
                   padding: EdgeInsets.symmetric(vertical: 48),
                   child: Center(
                     child:
@@ -976,7 +976,7 @@ class _AddTeamMemberSheetState extends ConsumerState<_AddTeamMemberSheet> {
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
                 child: Text(
                   _error!,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: AppColors.notificationDot, fontSize: 13),
                 ),
               ),
@@ -1057,7 +1057,7 @@ class _ContactPickRow extends StatelessWidget {
                   children: [
                     Text(
                       contact.displayName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -1068,7 +1068,7 @@ class _ContactPickRow extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: AppColors.textMuted, fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                       ),

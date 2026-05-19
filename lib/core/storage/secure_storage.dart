@@ -5,6 +5,7 @@ class SecureStorage {
   static const _accessTokenKey = 'accessToken';
   static const _refreshTokenKey = 'refreshToken';
   static const _userKey = 'user';
+  static const _themeKey = 'themePreference';
 
   final FlutterSecureStorage _storage;
 
@@ -31,7 +32,15 @@ class SecureStorage {
       user == null ? deleteUser() : _storage.write(key: _userKey, value: jsonEncode(user));
   Future<void> deleteUser() => _storage.delete(key: _userKey);
 
+  /// Estilo de color elegido (storageKey de `AppPaletteId`). Sobrevive al
+  /// logout: no se borra en `clearAll` para no reiniciar la preferencia.
+  Future<String?> get themePreference => _storage.read(key: _themeKey);
+  Future<void> setThemePreference(String key) =>
+      _storage.write(key: _themeKey, value: key);
+
   Future<void> clearAll() async {
+    final theme = await themePreference;
     await _storage.deleteAll();
+    if (theme != null) await setThemePreference(theme);
   }
 }

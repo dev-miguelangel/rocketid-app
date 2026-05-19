@@ -10,6 +10,9 @@ class Profile with _$Profile {
   const factory Profile({
     String? id,
     String? birthDate,
+    // Edad calculada por el backend a partir de `birthDate`. `null` si no hay
+    // fecha de nacimiento; entero con los años cumplidos en caso contrario.
+    int? age,
     String? gender,
     String? city,
     String? phone,

@@ -92,4 +92,13 @@ class AuthBackendConfig {
 
   /// Catálogo de deportes: `GET /sports`.
   static const String sportsPath = '/sports';
+
+  /// Actividades. `GET/POST /activities`, `GET/PATCH/DELETE /activities/:id`,
+  /// y subrutas de participación bajo `/activities/:id/...`.
+  /// Ver `docs/actividades-api.md`.
+  static const String activitiesPath = '/activities';
+
+  /// Inbox de acciones pendientes del usuario: `GET /pending-actions`.
+  /// Devuelve invitaciones, convocatorias y solicitudes por resolver.
+  static const String pendingActionsPath = '/pending-actions';
 }

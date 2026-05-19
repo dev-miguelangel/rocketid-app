@@ -14,7 +14,7 @@ class AppBottomNav extends StatelessWidget {
 
   static const _items = <_NavItem>[
     _NavItem('Inicio', Icons.home_outlined, Icons.home),
-    _NavItem('Eventos', Icons.calendar_month_outlined, Icons.calendar_month),
+    _NavItem('Agenda', Icons.calendar_month_outlined, Icons.calendar_month),
     _NavItem('Actividad', Icons.directions_run, Icons.directions_run),
     _NavItem('Contactos', Icons.people_outlined, Icons.people),
     _NavItem('Perfil', Icons.person_outlined, Icons.person),
@@ -26,7 +26,7 @@ class AppBottomNav extends StatelessWidget {
       top: false,
       child: Container(
         height: 72,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.scaffoldBg,
           border: Border(
             top: BorderSide(color: AppColors.borderSubtle),

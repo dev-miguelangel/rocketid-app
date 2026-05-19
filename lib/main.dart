@@ -2,21 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
+import 'core/storage/secure_storage.dart';
+import 'features/settings/application/theme_controller.dart';
+import 'providers.dart';
+import 'shared/theme/app_colors.dart';
+import 'shared/theme/app_palette.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: Color(0xFF0A0A0A),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
+
+  // Resuelve el estilo guardado antes del primer frame para evitar parpadeo.
+  final storage = SecureStorage();
+  final palette = AppPaletteId.fromKey(await storage.themePreference);
+  AppColors.apply(palette);
+  SystemChrome.setSystemUIOverlayStyle(systemOverlayFor(palette));
+
   runApp(
-    const ProviderScope(
-      child: App(),
+    ProviderScope(
+      overrides: [
+        themeControllerProvider.overrideWith(
+          (ref) => ThemeController(ref.watch(secureStorageProvider), palette),
+        ),
+      ],
+      child: const App(),
     ),
   );
 }

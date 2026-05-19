@@ -66,6 +66,11 @@ final Map<String, IconData> _teamIconByName = {
 IconData resolveTeamIcon(String? name) =>
     _teamIconByName[name] ?? Icons.groups;
 
+/// Resuelve el icono de un deporte por su nombre (p. ej. `sports_soccer`);
+/// usa un icono genérico de deporte como respaldo.
+IconData resolveSportIcon(String? name) =>
+    _teamIconByName[name] ?? Icons.sports;
+
 /// Paleta fija de colores de equipo (de `docs/curls/teams-curls.md`).
 const List<String> kTeamColors = [
   '#E53935', '#D81B60', '#8E24AA', '#5E35B1',

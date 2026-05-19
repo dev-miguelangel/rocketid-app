@@ -316,7 +316,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
               const SizedBox(height: 8),
               TextButton(
                 onPressed: _saving ? null : () => context.pop(),
-                child: const Text(
+                child: Text(
                   'Cancelar',
                   style: TextStyle(color: AppColors.textMuted),
                 ),
@@ -478,7 +478,7 @@ class _EmergencySection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -501,7 +501,7 @@ class _EmergencySection extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.chevron_right,
                   color: AppColors.brandGreen,
                   size: 22,
@@ -566,7 +566,7 @@ class _SectionCard extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
@@ -613,7 +613,7 @@ class _Field extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       maxLines: maxLines,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       cursorColor: AppColors.brandGreen,
       decoration:
           _decoration(label: label, hint: hint, helper: helper, icon: icon),
@@ -636,7 +636,7 @@ class _BloodTypeField extends StatelessWidget {
       isExpanded: true,
       dropdownColor: AppColors.surfaceCard,
       iconEnabledColor: AppColors.textMuted,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       decoration: _decoration(
         label: 'Tipo de sangre',
         icon: Icons.bloodtype_outlined,
@@ -668,7 +668,7 @@ class _GenderField extends StatelessWidget {
       isExpanded: true,
       dropdownColor: AppColors.surfaceCard,
       iconEnabledColor: AppColors.textMuted,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       decoration: _decoration(label: 'Género', icon: Icons.wc_outlined),
       items: [
         for (final entry in genderOptions.entries)
@@ -704,13 +704,13 @@ class _BirthDateField extends StatelessWidget {
           lastDate: now,
           builder: (ctx, child) => Theme(
             data: Theme.of(ctx).copyWith(
-              colorScheme: const ColorScheme.dark(
+              colorScheme: ColorScheme.dark(
                 primary: AppColors.brandGreen,
                 onPrimary: Colors.black,
                 surface: AppColors.surfaceCard,
                 onSurface: AppColors.textPrimary,
               ),
-              dialogTheme: const DialogThemeData(
+              dialogTheme: DialogThemeData(
                 backgroundColor: AppColors.surfaceCard,
               ),
             ),
@@ -738,7 +738,7 @@ class _BirthDateField extends StatelessWidget {
             icon: Icons.cake_outlined,
             hint: 'YYYY-MM-DD',
           ).copyWith(
-            suffixIcon: const Icon(
+            suffixIcon: Icon(
               Icons.calendar_month_outlined,
               color: AppColors.textMuted,
               size: 20,
@@ -760,14 +760,14 @@ InputDecoration _decoration({
     labelText: label,
     hintText: hint,
     helperText: helper,
-    labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-    floatingLabelStyle: const TextStyle(
+    labelStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
+    floatingLabelStyle: TextStyle(
       color: AppColors.brandGreen,
       fontSize: 14,
       fontWeight: FontWeight.w600,
     ),
-    hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 14),
-    helperStyle: const TextStyle(color: AppColors.textFaint, fontSize: 12),
+    hintStyle: TextStyle(color: AppColors.textFaint, fontSize: 14),
+    helperStyle: TextStyle(color: AppColors.textFaint, fontSize: 12),
     prefixIcon: Icon(icon, color: AppColors.textMuted, size: 20),
     filled: true,
     fillColor: AppColors.surfaceChip,
@@ -775,15 +775,15 @@ InputDecoration _decoration({
         const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.borderChip),
+      borderSide: BorderSide(color: AppColors.borderChip),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.borderChip),
+      borderSide: BorderSide(color: AppColors.borderChip),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.brandGreen, width: 1.5),
+      borderSide: BorderSide(color: AppColors.brandGreen, width: 1.5),
     ),
   );
 }

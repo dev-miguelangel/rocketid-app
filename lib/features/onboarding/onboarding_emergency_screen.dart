@@ -153,12 +153,12 @@ class _OnboardingEmergencyScreenState
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: _busy ? null : _importFromContacts,
-              icon: const Icon(
+              icon: Icon(
                 Icons.contacts_outlined,
                 color: AppColors.brandGreen,
                 size: 20,
               ),
-              label: const Text(
+              label: Text(
                 'Importar de contactos',
                 style: TextStyle(
                   color: AppColors.brandGreen,
@@ -168,7 +168,7 @@ class _OnboardingEmergencyScreenState
               ),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                side: const BorderSide(color: AppColors.brandGreen),
+                side: BorderSide(color: AppColors.brandGreen),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -179,7 +179,7 @@ class _OnboardingEmergencyScreenState
           TextFormField(
             controller: _nameCtrl,
             textCapitalization: TextCapitalization.words,
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: TextStyle(color: AppColors.textPrimary),
             cursorColor: AppColors.brandGreen,
             decoration: onboardingFieldDecoration(
               label: 'Nombre',
@@ -195,7 +195,7 @@ class _OnboardingEmergencyScreenState
               FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s-]')),
               LengthLimitingTextInputFormatter(20),
             ],
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: TextStyle(color: AppColors.textPrimary),
             cursorColor: AppColors.brandGreen,
             decoration: onboardingFieldDecoration(
               label: 'Teléfono',
@@ -212,7 +212,7 @@ class _OnboardingEmergencyScreenState
             menuMaxHeight: 360,
             dropdownColor: AppColors.surfaceCard,
             iconEnabledColor: AppColors.textMuted,
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
             decoration: onboardingFieldDecoration(
               label: 'Relación',
               icon: Icons.favorite_border,

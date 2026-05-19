@@ -94,13 +94,13 @@ class _OnboardingPersonalScreenState
       lastDate: now,
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-          colorScheme: const ColorScheme.dark(
+          colorScheme: ColorScheme.dark(
             primary: AppColors.brandGreen,
             onPrimary: Colors.black,
             surface: AppColors.surfaceCard,
             onSurface: AppColors.textPrimary,
           ),
-          dialogTheme: const DialogThemeData(
+          dialogTheme: DialogThemeData(
             backgroundColor: AppColors.surfaceCard,
           ),
         ),
@@ -154,7 +154,7 @@ class _OnboardingPersonalScreenState
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s-]')),
                 LengthLimitingTextInputFormatter(20),
               ],
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: TextStyle(color: AppColors.textPrimary),
               cursorColor: AppColors.brandGreen,
               decoration: onboardingFieldDecoration(
                 label: 'Teléfono',
@@ -198,7 +198,7 @@ class _BirthDateTile extends StatelessWidget {
                 icon: Icons.cake_outlined,
                 hint: 'YYYY-MM-DD',
               ).copyWith(
-                suffixIcon: const Icon(
+                suffixIcon: Icon(
                   Icons.calendar_month_outlined,
                   color: AppColors.textMuted,
                   size: 20,
@@ -225,7 +225,7 @@ class _GenderDropdown extends StatelessWidget {
       isExpanded: true,
       dropdownColor: AppColors.surfaceCard,
       iconEnabledColor: AppColors.textMuted,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       decoration: onboardingFieldDecoration(
         label: 'Género',
         icon: Icons.wc_outlined,
@@ -257,7 +257,7 @@ class _CityDropdown extends StatelessWidget {
           value: '__zone_${entry.key}',
           child: Text(
             entry.key.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textMuted,
               fontSize: 11,
               fontWeight: FontWeight.w800,
@@ -284,7 +284,7 @@ class _CityDropdown extends StatelessWidget {
       menuMaxHeight: 360,
       dropdownColor: AppColors.surfaceCard,
       iconEnabledColor: AppColors.textMuted,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       decoration: onboardingFieldDecoration(
         label: 'Ciudad',
         icon: Icons.location_city_outlined,

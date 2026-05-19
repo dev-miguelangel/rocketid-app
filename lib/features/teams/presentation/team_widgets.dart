@@ -49,26 +49,26 @@ class TeamSearchField extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       cursorColor: AppColors.brandGreen,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 14),
-        prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 20),
+        hintStyle: TextStyle(color: AppColors.textFaint, fontSize: 14),
+        prefixIcon: Icon(Icons.search, color: AppColors.textMuted, size: 20),
         filled: true,
         fillColor: AppColors.surfaceChip,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.borderChip),
+          borderSide: BorderSide(color: AppColors.borderChip),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.borderChip),
+          borderSide: BorderSide(color: AppColors.borderChip),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.brandGreen),
+          borderSide: BorderSide(color: AppColors.brandGreen),
         ),
       ),
     );
@@ -84,7 +84,7 @@ class TeamSectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         color: AppColors.textMuted,
         fontSize: 12,
         fontWeight: FontWeight.w700,
@@ -122,7 +122,7 @@ class TeamEmptyCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w800,
@@ -132,7 +132,7 @@ class TeamEmptyCard extends StatelessWidget {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
           ),
         ],
       ),
@@ -163,7 +163,7 @@ class TeamInfoCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+              style: TextStyle(color: AppColors.textMuted, fontSize: 14),
             ),
           ),
         ],
@@ -185,7 +185,7 @@ class TeamLoadingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.borderSubtle),
       ),
-      child: const Center(
+      child: Center(
         child: CircularProgressIndicator(color: AppColors.brandGreen),
       ),
     );
@@ -214,13 +214,13 @@ class TeamInlineErrorCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.error_outline,
+          Icon(Icons.error_outline,
               color: AppColors.notificationDot, size: 36),
           const SizedBox(height: 12),
           Text(
             friendlyTeamError(error),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
           ),
           const SizedBox(height: 16),
           FilledButton(

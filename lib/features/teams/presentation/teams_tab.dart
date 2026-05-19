@@ -248,7 +248,7 @@ class _TeamTile extends ConsumerWidget {
                     children: [
                       Text(
                         team.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -258,7 +258,7 @@ class _TeamTile extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitleParts.join(' · '),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textMuted,
                           fontSize: 13,
                         ),
@@ -267,7 +267,7 @@ class _TeamTile extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                Icon(Icons.chevron_right, color: AppColors.textMuted),
               ],
             ),
           ),
@@ -345,7 +345,7 @@ class _TeamResultTileState extends ConsumerState<_TeamResultTile> {
               children: [
                 Text(
                   team.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -355,7 +355,7 @@ class _TeamResultTileState extends ConsumerState<_TeamResultTile> {
                 const SizedBox(height: 2),
                 Text(
                   subtitleParts.join(' · '),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 13,
                   ),
@@ -398,7 +398,7 @@ class _ApplyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.borderChip),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.check, size: 16, color: AppColors.textMuted),

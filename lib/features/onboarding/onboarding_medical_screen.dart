@@ -115,7 +115,7 @@ class _OnboardingMedicalScreenState
             isExpanded: true,
             dropdownColor: AppColors.surfaceCard,
             iconEnabledColor: AppColors.textMuted,
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
             decoration: onboardingFieldDecoration(
               label: 'Tipo de sangre',
               icon: Icons.bloodtype_outlined,
@@ -132,7 +132,7 @@ class _OnboardingMedicalScreenState
           const SizedBox(height: 14),
           TextFormField(
             controller: _allergiesCtrl,
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: TextStyle(color: AppColors.textPrimary),
             cursorColor: AppColors.brandGreen,
             decoration: onboardingFieldDecoration(
               label: 'Alergias',
@@ -144,7 +144,7 @@ class _OnboardingMedicalScreenState
           TextFormField(
             controller: _conditionsCtrl,
             maxLines: 3,
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: TextStyle(color: AppColors.textPrimary),
             cursorColor: AppColors.brandGreen,
             decoration: onboardingFieldDecoration(
               label: 'Condiciones',
@@ -155,7 +155,7 @@ class _OnboardingMedicalScreenState
           const SizedBox(height: 14),
           TextFormField(
             controller: _medicationsCtrl,
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: TextStyle(color: AppColors.textPrimary),
             cursorColor: AppColors.brandGreen,
             decoration: onboardingFieldDecoration(
               label: 'Medicamentos',

@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../providers.dart';
 import '../../shared/theme/app_colors.dart';
 import '../../shared/widgets/app_bottom_nav.dart';
+import '../../shared/widgets/app_nav_handler.dart';
 import '../../shared/widgets/app_top_bar.dart';
+import '../activities/presentation/activity_form_sheet.dart';
 import '../auth/domain/user.dart';
 
 final meProvider = FutureProvider.autoDispose<User>((ref) async {
@@ -51,26 +53,12 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppTopBar.inner(title: 'Perfil'),
       bottomNavigationBar: AppBottomNav(
         currentIndex: 4,
-        onTap: (i) {
-          if (i == 4) return;
-          if (i == 0) {
-            context.go('/inicio');
-            return;
-          }
-          if (i == 3) {
-            context.go('/contactos');
-            return;
-          }
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              const SnackBar(
-                content: Text('Esta sección estará disponible pronto'),
-                backgroundColor: AppColors.surfaceCard,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-        },
+        onTap: (i) => handleNavTap(
+          context,
+          i,
+          currentIndex: 4,
+          onCreateActivity: () => createActivityFlow(context, ref),
+        ),
       ),
       body: meAsync.when(
         data: (user) => RefreshIndicator(
@@ -79,7 +67,7 @@ class ProfileScreen extends ConsumerWidget {
           onRefresh: () => ref.refresh(meProvider.future),
           child: _ProfileBody(user: user),
         ),
-        loading: () => const Center(
+        loading: () => Center(
           child: CircularProgressIndicator(color: AppColors.brandGreen),
         ),
         error: (err, _) => _ErrorState(
@@ -117,6 +105,11 @@ class _ProfileBody extends ConsumerWidget {
               icon: Icons.cake_outlined,
               label: 'Fecha de nacimiento',
               value: profile?.birthDate,
+            ),
+            _Row(
+              icon: Icons.numbers_outlined,
+              label: 'Edad',
+              value: profile?.age == null ? null : '${profile!.age} años',
             ),
             _Row(
               icon: Icons.wc_outlined,
@@ -200,6 +193,10 @@ class _ProfileBody extends ConsumerWidget {
             ),
           ],
         ),
+        const SizedBox(height: 12),
+        _SettingsTile(
+          onTap: () => context.push('/perfil/ajustes'),
+        ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
@@ -207,7 +204,7 @@ class _ProfileBody extends ConsumerWidget {
           child: OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.notificationDot,
-              side: const BorderSide(color: AppColors.borderChip),
+              side: BorderSide(color: AppColors.borderChip),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -229,6 +226,50 @@ class _ProfileBody extends ConsumerWidget {
   static String? _joinList(List<String>? values) {
     if (values == null || values.isEmpty) return null;
     return values.join(', ');
+  }
+}
+
+/// Acceso a la pantalla de Ajustes (estilo de color, etc.).
+class _SettingsTile extends StatelessWidget {
+  const _SettingsTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceCard,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.borderSubtle),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.tune, color: AppColors.brandGreen, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Ajustes',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right,
+                  color: AppColors.textMuted, size: 22),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -260,7 +301,7 @@ class _Header extends StatelessWidget {
               children: [
                 Text(
                   displayName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -270,7 +311,7 @@ class _Header extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   user.email,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 13,
                   ),
@@ -355,7 +396,7 @@ class _Tag extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.textSecondary,
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -397,7 +438,7 @@ class _Section extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -407,7 +448,7 @@ class _Section extends StatelessWidget {
               if (onEdit != null)
                 IconButton(
                   onPressed: onEdit,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.edit_outlined,
                     size: 18,
                     color: AppColors.textMuted,
@@ -460,7 +501,7 @@ class _Row extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -505,13 +546,13 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.error_outline,
             color: AppColors.notificationDot,
             size: 48,
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No pudimos cargar tu perfil',
             style: TextStyle(
               color: AppColors.textPrimary,
@@ -523,7 +564,7 @@ class _ErrorState extends StatelessWidget {
           Text(
             '$error',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
           ),
           const SizedBox(height: 20),
           FilledButton(
@@ -543,7 +584,7 @@ class _ErrorState extends StatelessWidget {
           const SizedBox(height: 8),
           TextButton(
             onPressed: onLogout,
-            child: const Text(
+            child: Text(
               'Cerrar sesión',
               style: TextStyle(color: AppColors.textMuted),
             ),

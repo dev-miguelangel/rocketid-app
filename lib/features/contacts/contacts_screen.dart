@@ -4,13 +4,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers.dart';
 import '../../shared/theme/app_colors.dart';
 import '../../shared/widgets/app_bottom_nav.dart';
+import '../../shared/widgets/app_nav_handler.dart';
 import '../../shared/widgets/app_top_bar.dart';
+import '../activities/presentation/activity_form_sheet.dart';
 import '../teams/domain/team.dart';
 import '../teams/presentation/team_form_sheet.dart';
 import '../teams/presentation/teams_tab.dart';
@@ -140,7 +141,12 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
       appBar: AppTopBar.inner(title: 'Contactos'),
       bottomNavigationBar: AppBottomNav(
         currentIndex: 3,
-        onTap: (i) => _onBottomNavTap(context, i),
+        onTap: (i) => handleNavTap(
+          context,
+          i,
+          currentIndex: 3,
+          onCreateActivity: () => createActivityFlow(context, ref),
+        ),
       ),
       floatingActionButton: _buildFab(),
       body: Column(
@@ -161,26 +167,6 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen>
     );
   }
 
-  void _onBottomNavTap(BuildContext context, int i) {
-    if (i == 3) return;
-    if (i == 0) {
-      context.go('/inicio');
-      return;
-    }
-    if (i == 4) {
-      context.go('/perfil');
-      return;
-    }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('Esta sección estará disponible pronto'),
-          backgroundColor: AppColors.surfaceCard,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-  }
 }
 
 class _TabsHeader extends StatelessWidget {
@@ -191,7 +177,7 @@ class _TabsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.scaffoldBg,
         border: Border(bottom: BorderSide(color: AppColors.borderSubtle)),
       ),
@@ -448,25 +434,25 @@ class _SearchField extends StatelessWidget {
       controller: controller,
       onChanged: onChanged,
       textInputAction: TextInputAction.search,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 15),
-        prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+        hintStyle: TextStyle(color: AppColors.textFaint, fontSize: 15),
+        prefixIcon: Icon(Icons.search, color: AppColors.textMuted),
         filled: true,
         fillColor: AppColors.surfaceCard,
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+          borderSide: BorderSide(color: AppColors.borderSubtle),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+          borderSide: BorderSide(color: AppColors.borderSubtle),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.brandGreen),
+          borderSide: BorderSide(color: AppColors.brandGreen),
         ),
       ),
     );
@@ -504,7 +490,7 @@ class _InviteCard extends StatelessWidget {
                 child: const Icon(Icons.chat, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -525,7 +511,7 @@ class _InviteCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.textMuted),
+              Icon(Icons.chevron_right, color: AppColors.textMuted),
             ],
           ),
         ),
@@ -545,7 +531,7 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 2),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.textMuted,
           fontSize: 12,
           fontWeight: FontWeight.w700,
@@ -584,7 +570,7 @@ class _EmptyCard extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -594,7 +580,7 @@ class _EmptyCard extends StatelessWidget {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 14),
           ),
         ],
       ),
@@ -624,7 +610,7 @@ class _InfoCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+              style: TextStyle(color: AppColors.textMuted, fontSize: 14),
             ),
           ),
         ],
@@ -645,7 +631,7 @@ class _LoadingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.borderSubtle),
       ),
-      child: const Center(
+      child: Center(
         child: SizedBox(
           width: 24,
           height: 24,
@@ -678,7 +664,7 @@ class _InlineErrorCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
+            children: [
               Icon(
                 Icons.error_outline,
                 color: AppColors.notificationDot,
@@ -700,14 +686,14 @@ class _InlineErrorCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             _friendlyError(error),
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
           ),
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: onRetry,
-              child: const Text(
+              child: Text(
                 'Reintentar',
                 style: TextStyle(
                   color: AppColors.brandGreen,
@@ -768,25 +754,25 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surfaceCard,
-        title: const Text(
+        title: Text(
           'Quitar contacto',
           style: TextStyle(color: AppColors.textPrimary),
         ),
         content: Text(
           '¿Quitar a ${widget.contact.displayName} de tus contactos?',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
+            child: Text(
               'Cancelar',
               style: TextStyle(color: AppColors.textMuted),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
+            child: Text(
               'Quitar',
               style: TextStyle(color: AppColors.notificationDot),
             ),
@@ -851,7 +837,7 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
               children: [
                 Text(
                   c.displayName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -862,7 +848,7 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textMuted,
                       fontSize: 13,
                     ),
@@ -883,7 +869,7 @@ class _ContactTileState extends ConsumerState<_ContactTile> {
           ] else ...[
             const SizedBox(width: 8),
             if (_saving)
-              const SizedBox(
+              SizedBox(
                 width: 40,
                 height: 40,
                 child: Center(
@@ -993,7 +979,7 @@ class _IconSquareButton extends StatelessWidget {
         color: AppColors.surfaceChip,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.borderChip),
+          side: BorderSide(color: AppColors.borderChip),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -1086,7 +1072,7 @@ class _ContactProfileSheetState extends State<_ContactProfileSheet> {
 
     return Container(
       constraints: BoxConstraints(maxHeight: media.size.height * 0.88),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.scaffoldBg,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1097,7 +1083,7 @@ class _ContactProfileSheetState extends State<_ContactProfileSheet> {
             padding: const EdgeInsets.fromLTRB(20, 14, 8, 10),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'Perfil',
                   style: TextStyle(
                     color: AppColors.textPrimary,
@@ -1108,12 +1094,12 @@ class _ContactProfileSheetState extends State<_ContactProfileSheet> {
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: AppColors.textMuted),
                 ),
               ],
             ),
           ),
-          const Divider(
+          Divider(
             height: 1,
             thickness: 1,
             color: AppColors.borderSubtle,
@@ -1128,7 +1114,7 @@ class _ContactProfileSheetState extends State<_ContactProfileSheet> {
                   Text(
                     c.displayName,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -1139,7 +1125,7 @@ class _ContactProfileSheetState extends State<_ContactProfileSheet> {
                     Text(
                       email,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 14,
                       ),
@@ -1237,7 +1223,7 @@ class _IdPillState extends State<_IdPill> {
       color: AppColors.surfaceChip,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.borderChip),
+        side: BorderSide(color: AppColors.borderChip),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -1255,7 +1241,7 @@ class _IdPillState extends State<_IdPill> {
               const SizedBox(width: 10),
               Text(
                 _copied ? 'Copiado' : widget.stringId,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -1284,7 +1270,7 @@ class _EmergencyButton extends StatelessWidget {
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textSecondary,
-          side: const BorderSide(color: AppColors.borderChip),
+          side: BorderSide(color: AppColors.borderChip),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
@@ -1293,7 +1279,7 @@ class _EmergencyButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.emergency,
               size: 20,
               color: AppColors.textSecondary,
@@ -1353,7 +1339,7 @@ class _EmergencyPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
+            children: [
               Icon(Icons.info_outline, size: 18, color: AppColors.textMuted),
               SizedBox(width: 8),
               Text(
@@ -1411,7 +1397,7 @@ class _EmergencyPanel extends StatelessWidget {
               ),
           ],
           if (!hasEmergency && !hasMedical)
-            const Text(
+            Text(
               'Este contacto aún no comparte sus datos de emergencia ni su información médica.',
               style: TextStyle(color: AppColors.textMuted, fontSize: 13),
             ),
@@ -1450,7 +1436,7 @@ class _EmergencyActions extends StatelessWidget {
             label: const Text('WhatsApp'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.brandGreen,
-              side: const BorderSide(color: AppColors.brandGreen),
+              side: BorderSide(color: AppColors.brandGreen),
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1472,7 +1458,7 @@ class _EmergencyActions extends StatelessWidget {
             label: const Text('Llamar'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
-              side: const BorderSide(color: AppColors.borderChip),
+              side: BorderSide(color: AppColors.borderChip),
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1509,7 +1495,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 14,
                   height: 1.3,
@@ -1518,7 +1504,7 @@ class _InfoRow extends StatelessWidget {
                   if (label != null)
                     TextSpan(
                       text: '$label: ',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1677,7 +1663,7 @@ class _GroupTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AppColors.borderChip),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.workspaces_outline,
                     color: AppColors.brandGreen,
                     size: 22,
@@ -1690,7 +1676,7 @@ class _GroupTile extends StatelessWidget {
                     children: [
                       Text(
                         group.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -1700,7 +1686,7 @@ class _GroupTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         _membersLabel(group.memberCount),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textMuted,
                           fontSize: 13,
                         ),
@@ -1708,7 +1694,7 @@ class _GroupTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                Icon(Icons.chevron_right, color: AppColors.textMuted),
               ],
             ),
           ),
@@ -1794,25 +1780,25 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.surfaceCard,
-        title: const Text(
+        title: Text(
           'Eliminar grupo',
           style: TextStyle(color: AppColors.textPrimary),
         ),
-        content: const Text(
+        content: Text(
           'Esta acción no se puede deshacer.',
           style: TextStyle(color: AppColors.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
+            child: Text(
               'Cancelar',
               style: TextStyle(color: AppColors.textMuted),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
+            child: Text(
               'Eliminar',
               style: TextStyle(
                 color: AppColors.notificationDot,
@@ -1887,7 +1873,7 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
 
     return Container(
       constraints: BoxConstraints(maxHeight: media.size.height * 0.9),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.scaffoldBg,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1907,7 +1893,7 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
                     borderRadius: BorderRadius.circular(11),
                     border: Border.all(color: AppColors.borderChip),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.workspaces_outline,
                     color: AppColors.brandGreen,
                     size: 18,
@@ -1917,7 +1903,7 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
                 Expanded(
                   child: Text(
                     name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 19,
                       fontWeight: FontWeight.w800,
@@ -1928,21 +1914,21 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
                 IconButton(
                   tooltip: 'Renombrar',
                   onPressed: _busy ? null : () => _rename(name),
-                  icon: const Icon(Icons.edit_outlined,
+                  icon: Icon(Icons.edit_outlined,
                       color: AppColors.textMuted),
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: AppColors.textMuted),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: AppColors.borderSubtle),
+          Divider(height: 1, thickness: 1, color: AppColors.borderSubtle),
           Flexible(
             child: detailAsync.when(
               data: (g) => _buildBody(g, media.padding.bottom),
-              loading: () => const Padding(
+              loading: () => Padding(
                 padding: EdgeInsets.symmetric(vertical: 56),
                 child: Center(
                   child: CircularProgressIndicator(color: AppColors.brandGreen),
@@ -1953,10 +1939,10 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline,
+                    Icon(Icons.error_outline,
                         color: AppColors.notificationDot, size: 40),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'No pudimos cargar el grupo',
                       style: TextStyle(
                         color: AppColors.textPrimary,
@@ -1967,7 +1953,7 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
                     Text(
                       _friendlyError(err),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 13,
                       ),
@@ -2003,7 +1989,7 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
     final children = <Widget>[
       Text(
         _membersLabel(g.memberCount),
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.textMuted,
           fontSize: 13,
           fontWeight: FontWeight.w600,
@@ -2016,7 +2002,7 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
         child: OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.brandGreen,
-            side: const BorderSide(color: AppColors.borderChip),
+            side: BorderSide(color: AppColors.borderChip),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
@@ -2056,7 +2042,7 @@ class _GroupDetailSheetState extends ConsumerState<_GroupDetailSheet> {
         child: OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.notificationDot,
-            side: const BorderSide(color: AppColors.borderChip),
+            side: BorderSide(color: AppColors.borderChip),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
@@ -2111,7 +2097,7 @@ class _GroupMemberTile extends StatelessWidget {
                     children: [
                       Text(
                         c.displayName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -2122,7 +2108,7 @@ class _GroupMemberTile extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           subtitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 13,
                           ),
@@ -2135,7 +2121,7 @@ class _GroupMemberTile extends StatelessWidget {
                 IconButton(
                   onPressed: onRemove,
                   tooltip: 'Quitar del grupo',
-                  icon: const Icon(Icons.close, size: 18,
+                  icon: Icon(Icons.close, size: 18,
                       color: AppColors.textMuted),
                 ),
               ],
@@ -2210,7 +2196,7 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
       padding: EdgeInsets.only(bottom: viewInsets),
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surfaceCard,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -2229,7 +2215,7 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Crear grupo',
               style: TextStyle(
                 color: AppColors.textPrimary,
@@ -2238,7 +2224,7 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
+            Text(
               'Solo minúsculas y números (sin espacios), máximo 30 caracteres.',
               style: TextStyle(color: AppColors.textMuted, fontSize: 13),
             ),
@@ -2254,14 +2240,14 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
                 FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9]')),
                 LengthLimitingTextInputFormatter(30),
               ],
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Ej: trabajo2026',
-                hintStyle: const TextStyle(color: AppColors.textFaint),
+                hintStyle: TextStyle(color: AppColors.textFaint),
                 filled: true,
                 fillColor: AppColors.surfaceChip,
                 errorText: _errorText,
-                prefixIcon: const Icon(
+                prefixIcon: Icon(
                   Icons.workspaces_outline,
                   color: AppColors.textMuted,
                 ),
@@ -2271,11 +2257,11 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.borderChip),
+                  borderSide: BorderSide(color: AppColors.borderChip),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.brandGreen),
+                  borderSide: BorderSide(color: AppColors.brandGreen),
                 ),
               ),
             ),
@@ -2373,7 +2359,7 @@ class _AddGroupMembersSheetState extends ConsumerState<_AddGroupMembersSheet> {
 
     return Container(
       constraints: BoxConstraints(maxHeight: media.size.height * 0.85),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.scaffoldBg,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -2384,7 +2370,7 @@ class _AddGroupMembersSheetState extends ConsumerState<_AddGroupMembersSheet> {
             padding: const EdgeInsets.fromLTRB(20, 14, 8, 10),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Agregar contactos',
                     style: TextStyle(
@@ -2396,12 +2382,12 @@ class _AddGroupMembersSheetState extends ConsumerState<_AddGroupMembersSheet> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: AppColors.textMuted),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: AppColors.borderSubtle),
+          Divider(height: 1, thickness: 1, color: AppColors.borderSubtle),
           Flexible(
             child: myContacts.when(
               data: (all) {
@@ -2409,7 +2395,7 @@ class _AddGroupMembersSheetState extends ConsumerState<_AddGroupMembersSheet> {
                     .where((c) => !widget.existingContactIds.contains(c.id))
                     .toList(growable: false);
                 if (available.isEmpty) {
-                  return const Padding(
+                  return Padding(
                     padding: EdgeInsets.all(32),
                     child: Center(
                       child: Text(
@@ -2440,7 +2426,7 @@ class _AddGroupMembersSheetState extends ConsumerState<_AddGroupMembersSheet> {
                   },
                 );
               },
-              loading: () => const Padding(
+              loading: () => Padding(
                 padding: EdgeInsets.symmetric(vertical: 48),
                 child: Center(
                   child: CircularProgressIndicator(color: AppColors.brandGreen),
@@ -2452,7 +2438,7 @@ class _AddGroupMembersSheetState extends ConsumerState<_AddGroupMembersSheet> {
                   child: Text(
                     'No pudimos cargar tus contactos.\n${_friendlyError(err)}',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style: TextStyle(color: AppColors.textMuted),
                   ),
                 ),
               ),
@@ -2463,7 +2449,7 @@ class _AddGroupMembersSheetState extends ConsumerState<_AddGroupMembersSheet> {
               padding: const EdgeInsets.fromLTRB(20, 6, 20, 0),
               child: Text(
                 _error!,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.notificationDot,
                   fontSize: 13,
                 ),
@@ -2550,7 +2536,7 @@ class _SelectableContactRow extends StatelessWidget {
                   children: [
                     Text(
                       c.displayName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -2561,7 +2547,7 @@ class _SelectableContactRow extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textMuted,
                           fontSize: 13,
                         ),
@@ -2576,7 +2562,7 @@ class _SelectableContactRow extends StatelessWidget {
                 onChanged: (v) => onChanged(v ?? false),
                 activeColor: AppColors.brandGreen,
                 checkColor: Colors.black,
-                side: const BorderSide(color: AppColors.borderChip),
+                side: BorderSide(color: AppColors.borderChip),
               ),
             ],
           ),
@@ -2640,7 +2626,7 @@ class _GroupNameDialogState extends State<_GroupNameDialog> {
       backgroundColor: AppColors.surfaceCard,
       title: Text(
         widget.title,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.textPrimary,
           fontSize: 18,
           fontWeight: FontWeight.w800,
@@ -2656,15 +2642,15 @@ class _GroupNameDialogState extends State<_GroupNameDialog> {
           FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9]')),
           LengthLimitingTextInputFormatter(30),
         ],
-        style: const TextStyle(color: AppColors.textPrimary),
+        style: TextStyle(color: AppColors.textPrimary),
         decoration: InputDecoration(
           hintText: 'nombre del grupo',
-          hintStyle: const TextStyle(color: AppColors.textFaint),
+          hintStyle: TextStyle(color: AppColors.textFaint),
           errorText: _error,
-          enabledBorder: const UnderlineInputBorder(
+          enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.borderChip),
           ),
-          focusedBorder: const UnderlineInputBorder(
+          focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.brandGreen),
           ),
         ),
@@ -2672,7 +2658,7 @@ class _GroupNameDialogState extends State<_GroupNameDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text(
+          child: Text(
             'Cancelar',
             style: TextStyle(color: AppColors.textMuted),
           ),

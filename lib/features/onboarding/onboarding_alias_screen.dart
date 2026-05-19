@@ -114,7 +114,7 @@ class _OnboardingAliasScreenState extends ConsumerState<OnboardingAliasScreen> {
                             ? '¡Bienvenido!'
                             : '¡Bienvenido, $_firstName!',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
@@ -122,7 +122,7 @@ class _OnboardingAliasScreenState extends ConsumerState<OnboardingAliasScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Te uniste al equipo de RocketId.\nGestiona tus eventos deportivos en un solo lugar.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -160,7 +160,7 @@ class _OnboardingAliasScreenState extends ConsumerState<OnboardingAliasScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '¿Con qué alias quieres que te encuentren las personas?',
@@ -186,7 +186,7 @@ class _OnboardingAliasScreenState extends ConsumerState<OnboardingAliasScreen> {
                               RegExp(r'[a-z0-9_]'),
                             ),
                           ],
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -194,14 +194,14 @@ class _OnboardingAliasScreenState extends ConsumerState<OnboardingAliasScreen> {
                           cursorColor: AppColors.brandGreen,
                           decoration: InputDecoration(
                             labelText: 'Alias',
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.alternate_email,
                               color: AppColors.textMuted,
                             ),
-                            labelStyle: const TextStyle(
+                            labelStyle: TextStyle(
                               color: AppColors.textMuted,
                             ),
-                            floatingLabelStyle: const TextStyle(
+                            floatingLabelStyle: TextStyle(
                               color: AppColors.brandGreen,
                             ),
                             filled: true,
@@ -212,19 +212,19 @@ class _OnboardingAliasScreenState extends ConsumerState<OnboardingAliasScreen> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
+                              borderSide: BorderSide(
                                 color: AppColors.borderChip,
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
+                              borderSide: BorderSide(
                                 color: AppColors.borderChip,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
+                              borderSide: BorderSide(
                                 color: AppColors.brandGreen,
                               ),
                             ),
@@ -363,7 +363,7 @@ class _FeatureRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 15,
               fontWeight: FontWeight.w500,

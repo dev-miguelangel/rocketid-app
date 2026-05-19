@@ -123,7 +123,7 @@ class _TeamFormSheetState extends ConsumerState<TeamFormSheet> {
       padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
       child: Container(
         constraints: BoxConstraints(maxHeight: media.size.height * 0.92),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surfaceCard,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -144,7 +144,7 @@ class _TeamFormSheetState extends ConsumerState<TeamFormSheet> {
             const SizedBox(height: 16),
             Text(
               widget.isEdit ? 'Editar equipo' : 'Crear equipo',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -219,7 +219,7 @@ class _TeamFormSheetState extends ConsumerState<TeamFormSheet> {
                     const SizedBox(height: 14),
                     Text(
                       _error!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.notificationDot,
                         fontSize: 13,
                       ),
@@ -268,7 +268,7 @@ class _TeamFormSheetState extends ConsumerState<TeamFormSheet> {
 
   Widget _label(String text) => Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.textMuted,
           fontSize: 13,
           fontWeight: FontWeight.w600,
@@ -287,12 +287,12 @@ class _TeamFormSheetState extends ConsumerState<TeamFormSheet> {
       enabled: !_saving,
       maxLines: maxLines,
       maxLength: maxLength,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
       cursorColor: AppColors.brandGreen,
       inputFormatters: [LengthLimitingTextInputFormatter(maxLength)],
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 14),
+        hintStyle: TextStyle(color: AppColors.textFaint, fontSize: 14),
         counterText: '',
         prefixIcon: Icon(icon, color: AppColors.textMuted, size: 20),
         filled: true,
@@ -300,15 +300,15 @@ class _TeamFormSheetState extends ConsumerState<TeamFormSheet> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.borderChip),
+          borderSide: BorderSide(color: AppColors.borderChip),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.borderChip),
+          borderSide: BorderSide(color: AppColors.borderChip),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.brandGreen),
+          borderSide: BorderSide(color: AppColors.brandGreen),
         ),
       ),
     );
@@ -339,9 +339,9 @@ class _SportPicker extends ConsumerWidget {
           isExpanded: true,
           dropdownColor: AppColors.surfaceCard,
           iconEnabledColor: AppColors.textMuted,
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
+          style: TextStyle(color: AppColors.textPrimary, fontSize: 15),
           decoration: _decoration(Icons.sports_outlined),
-          hint: const Text(
+          hint: Text(
             'Selecciona un deporte',
             style: TextStyle(color: AppColors.textFaint, fontSize: 14),
           ),
@@ -354,7 +354,7 @@ class _SportPicker extends ConsumerWidget {
       },
       loading: () => InputDecorator(
         decoration: _decoration(Icons.sports_outlined),
-        child: const Row(
+        child: Row(
           children: [
             SizedBox(
               width: 16,
@@ -379,7 +379,7 @@ class _SportPicker extends ConsumerWidget {
           decoration: _decoration(Icons.error_outline),
           child: Text(
             'No pudimos cargar deportes. Toca para reintentar.',
-            style: const TextStyle(color: AppColors.notificationDot, fontSize: 13),
+            style: TextStyle(color: AppColors.notificationDot, fontSize: 13),
           ),
         ),
       ),
@@ -393,15 +393,15 @@ class _SportPicker extends ConsumerWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.borderChip),
+          borderSide: BorderSide(color: AppColors.borderChip),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.borderChip),
+          borderSide: BorderSide(color: AppColors.borderChip),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.brandGreen),
+          borderSide: BorderSide(color: AppColors.brandGreen),
         ),
       );
 }

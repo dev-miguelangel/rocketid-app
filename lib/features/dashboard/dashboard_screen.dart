@@ -5,7 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../providers.dart';
 import '../../shared/theme/app_colors.dart';
 import '../../shared/widgets/app_bottom_nav.dart';
+import '../../shared/widgets/app_nav_handler.dart';
 import '../../shared/widgets/app_top_bar.dart';
+import '../activities/domain/activity.dart';
+import '../activities/domain/activity_enums.dart';
+import '../activities/presentation/activity_form_sheet.dart';
+import '../activities/presentation/activity_list_tile.dart';
+import '../activities/presentation/activity_widgets.dart';
 import '../auth/application/session_state.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -32,18 +38,12 @@ class DashboardScreen extends ConsumerWidget {
       ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: 0,
-        onTap: (i) {
-          if (i == 0) return;
-          if (i == 3) {
-            context.push('/contactos');
-            return;
-          }
-          if (i == 4) {
-            context.push('/perfil');
-            return;
-          }
-          _showSoon(context, 'Esta sección');
-        },
+        onTap: (i) => handleNavTap(
+          context,
+          i,
+          currentIndex: 0,
+          onCreateActivity: () => createActivityFlow(context, ref),
+        ),
       ),
       body: const _DashboardBody(),
     );
@@ -83,6 +83,16 @@ class _DashboardBody extends ConsumerWidget {
       _ => 'equipos activos',
     };
 
+    final pendingAsync = ref.watch(pendingActionsProvider);
+    final pendingCount = pendingAsync.asData?.value.total;
+    final pendingValue = pendingCount?.toString() ?? '—';
+    final pendingCaption = switch (pendingCount) {
+      null => 'cargando…',
+      0 => 'sin pendientes',
+      1 => '1 acción',
+      _ => 'acciones',
+    };
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       child: Column(
@@ -90,11 +100,12 @@ class _DashboardBody extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: _StatCard(
-                  label: 'EVENTOS',
-                  value: '0',
-                  caption: 'este mes',
+                  label: 'PENDIENTES',
+                  value: pendingValue,
+                  caption: pendingCaption,
+                  onTap: () => context.push('/pendientes'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -144,7 +155,7 @@ class _StatCard extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textMuted,
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -154,7 +165,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.brandGreen,
               fontSize: 36,
               fontWeight: FontWeight.w800,
@@ -163,7 +174,7 @@ class _StatCard extends StatelessWidget {
           const Spacer(),
           Text(
             caption,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textMuted,
               fontSize: 14,
             ),
@@ -186,11 +197,16 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _ActivityCard extends StatelessWidget {
+class _ActivityCard extends ConsumerWidget {
   const _ActivityCard();
 
+  /// Máximo de actividades listadas en el dashboard antes de enlazar a la agenda.
+  static const _maxItems = 5;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activitiesAsync = ref.watch(myActivitiesProvider);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
       decoration: BoxDecoration(
@@ -203,14 +219,14 @@ class _ActivityCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.show_chart,
                 color: AppColors.brandGreen,
                 size: 22,
               ),
-              const SizedBox(width: 10),
-              const Text(
-                'Mi actividad',
+              SizedBox(width: 10),
+              Text(
+                'Mis actividades',
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 18,
@@ -219,35 +235,125 @@ class _ActivityCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          Center(
-            child: Icon(
-              Icons.calendar_today_outlined,
-              color: AppColors.textMuted.withValues(alpha: 0.7),
-              size: 40,
+          const SizedBox(height: 12),
+          activitiesAsync.when(
+            loading: () => const ActivityLoadingState(),
+            error: (_, _) => _ErrorBlock(
+              onRetry: () => ref.invalidate(myActivitiesProvider),
             ),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            'No tienes eventos ni actividades próximas',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Crea un evento o únete a uno existente.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 14,
-            ),
+            data: (list) => _content(context, list),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _content(BuildContext context, List<Activity> list) {
+    final now = DateTime.now();
+    final upcoming = list
+        .where((a) =>
+            a.status != ActivityStatus.completed && a.endsAt.isAfter(now))
+        .toList()
+      ..sort((a, b) => a.startsAt.compareTo(b.startsAt));
+
+    if (upcoming.isEmpty) return const _EmptyBlock();
+
+    final visible = upcoming.take(_maxItems).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var i = 0; i < visible.length; i++) ...[
+          if (i > 0) const SizedBox(height: 10),
+          ActivityListTile(activity: visible[i]),
+        ],
+        if (upcoming.length > _maxItems)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => context.push('/agenda'),
+              child: Text(
+                'Ver todas en la agenda',
+                style: TextStyle(
+                  color: AppColors.brandGreen,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _EmptyBlock extends StatelessWidget {
+  const _EmptyBlock();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 12),
+        Center(
+          child: Icon(
+            Icons.calendar_today_outlined,
+            color: AppColors.textMuted.withValues(alpha: 0.7),
+            size: 40,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'No tienes eventos ni actividades próximas',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Crea un evento o únete a uno existente.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.textMuted,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ErrorBlock extends StatelessWidget {
+  const _ErrorBlock({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          'No pudimos cargar tus actividades',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        TextButton(
+          onPressed: onRetry,
+          child: Text(
+            'Reintentar',
+            style: TextStyle(
+              color: AppColors.brandGreen,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
