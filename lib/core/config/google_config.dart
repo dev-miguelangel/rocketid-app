@@ -21,8 +21,13 @@ class GoogleConfig {
   ///
   /// Se usa como `serverClientId` en el SDK `google_sign_in` para que el
   /// `idToken` emitido por Google sea aceptado por el backend.
-  static const String webClientId =
-      '907664370232-42tgp4q4emm4c85t7o7loug2at6er70i.apps.googleusercontent.com';
+  ///
+  /// Overridable en build con `--dart-define=GOOGLE_WEB_CLIENT_ID=...`.
+  static const String webClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+    defaultValue:
+        '907664370232-42tgp4q4emm4c85t7o7loug2at6er70i.apps.googleusercontent.com',
+  );
 
   /// `serverClientId` requerido por `google_sign_in` en Android para recibir
   /// un `idToken` validable por el backend.
@@ -35,10 +40,15 @@ class AuthBackendConfig {
 
   /// Base URL del backend.
   ///
+  /// Overridable en build con `--dart-define=API_BASE_URL=https://...`.
+  /// Web servido en HTTPS requiere un backend HTTPS (mixed-content), por lo
+  /// que el build de web debe pasar una URL HTTPS aquí.
   /// TODO: migrar a HTTPS antes de producción. Mientras tanto, Android requiere
   /// una excepción de cleartext acotada a este host (ver `docs/google.md`).
-  static const String baseUrl =
-      'http://wlsc6ryuexi1391hw66vm9vz.166.0.112.2.sslip.io';
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://wlsc6ryuexi1391hw66vm9vz.166.0.112.2.sslip.io',
+  );
 
   /// Endpoint que intercambia el `idToken` de Google por tokens de la app.
   static const String googleTokenPath = '/auth/google/token';

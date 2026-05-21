@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -121,6 +122,10 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
 
   Future<void> _useMyLocation() async {
     if (_locating) return;
+    if (kIsWeb) {
+      _notify('Disponible solo en la app móvil');
+      return;
+    }
     setState(() => _locating = true);
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
@@ -305,26 +310,27 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                     size: 44,
                   ),
                 ),
-                Positioned(
-                  right: 16,
-                  bottom: 16,
-                  child: FloatingActionButton.small(
-                    heroTag: 'use-location',
-                    onPressed: _useMyLocation,
-                    backgroundColor: AppColors.surfaceCard,
-                    foregroundColor: AppColors.brandGreen,
-                    child: _locating
-                        ? SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.brandGreen,
-                            ),
-                          )
-                        : const Icon(Icons.my_location),
+                if (!kIsWeb)
+                  Positioned(
+                    right: 16,
+                    bottom: 16,
+                    child: FloatingActionButton.small(
+                      heroTag: 'use-location',
+                      onPressed: _useMyLocation,
+                      backgroundColor: AppColors.surfaceCard,
+                      foregroundColor: AppColors.brandGreen,
+                      child: _locating
+                          ? SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.brandGreen,
+                              ),
+                            )
+                          : const Icon(Icons.my_location),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

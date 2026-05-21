@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -79,6 +80,10 @@ class _OnboardingEmergencyScreenState
 
   Future<void> _importFromContacts() async {
     if (_busy) return;
+    if (kIsWeb) {
+      _toast('Disponible solo en la app móvil');
+      return;
+    }
     try {
       final status =
           await FlutterContacts.permissions.request(PermissionType.read);
@@ -149,33 +154,35 @@ class _OnboardingEmergencyScreenState
       onSecondary: () => _submit(skip: true),
       child: Column(
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: _busy ? null : _importFromContacts,
-              icon: Icon(
-                Icons.contacts_outlined,
-                color: AppColors.brandGreen,
-                size: 20,
-              ),
-              label: Text(
-                'Importar de contactos',
-                style: TextStyle(
+          if (!kIsWeb) ...[
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _busy ? null : _importFromContacts,
+                icon: Icon(
+                  Icons.contacts_outlined,
                   color: AppColors.brandGreen,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                  size: 20,
                 ),
-              ),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                side: BorderSide(color: AppColors.brandGreen),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                label: Text(
+                  'Importar de contactos',
+                  style: TextStyle(
+                    color: AppColors.brandGreen,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: BorderSide(color: AppColors.brandGreen),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 18),
+            const SizedBox(height: 18),
+          ],
           TextFormField(
             controller: _nameCtrl,
             textCapitalization: TextCapitalization.words,

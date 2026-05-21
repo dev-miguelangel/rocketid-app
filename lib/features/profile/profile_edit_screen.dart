@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -194,6 +195,10 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       .toList();
 
   Future<void> _importFromContacts() async {
+    if (kIsWeb) {
+      _toast('Disponible solo en la app móvil');
+      return;
+    }
     try {
       final status =
           await FlutterContacts.permissions.request(PermissionType.read);
@@ -450,66 +455,68 @@ class _EmergencySection extends StatelessWidget {
       title: 'Contacto de emergencia',
       icon: Icons.emergency_outlined,
       children: [
-        InkWell(
-          onTap: onImportFromContacts,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.brandGreen.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.brandGreen.withValues(alpha: 0.4),
+        if (!kIsWeb)
+          InkWell(
+            onTap: onImportFromContacts,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.brandGreen.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.brandGreen.withValues(alpha: 0.4),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.brandGreen,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.contacts_outlined,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Importar desde contactos',
+                          style: TextStyle(
+                            color: AppColors.brandGreen,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Elige un contacto del teléfono',
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: AppColors.brandGreen,
+                    size: 22,
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.brandGreen,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.contacts_outlined,
-                    color: Colors.black,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Importar desde contactos',
-                        style: TextStyle(
-                          color: AppColors.brandGreen,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Elige un contacto del teléfono',
-                        style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.brandGreen,
-                  size: 22,
-                ),
-              ],
-            ),
           ),
-        ),
         _Field(
           label: 'Nombre',
           controller: name,

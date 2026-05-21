@@ -1,0 +1,44 @@
+.git
+.github
+.idea
+.vscode
+.claude
+.dart_tool
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# Builds locales
+build/
+ios/Pods/
+android/.gradle/
+android/app/build/
+android/build/
+macos/Pods/
+linux/build/
+windows/build/
+
+# Plataformas que no se compilan en el contenedor web
+android/
+ios/
+macos/
+linux/
+windows/
+
+# Docs y assets pesados que no son del bundle web
+docs/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+screenshot.png
+flutter_01.png
+flutter_02.png
+flutter_03.png
+
+# Editor / OS noise
+.DS_Store
+*.iml
+*.log
+*.swp

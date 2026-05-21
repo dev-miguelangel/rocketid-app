@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../core/config/google_config.dart';
 
@@ -20,10 +21,16 @@ class GoogleSignInService {
   Future<void> init() async {
     if (_initialized) return;
     _googleSignIn = GoogleSignIn.instance;
-    await _googleSignIn.initialize(
-      clientId: GoogleConfig.androidClientId,
-      serverClientId: GoogleConfig.serverClientId,
-    );
+    if (kIsWeb) {
+      // En web, el SDK Google Identity Services lee el client ID web; no se
+      // usa `serverClientId` (el idToken ya está emitido para ese audience).
+      await _googleSignIn.initialize(clientId: GoogleConfig.webClientId);
+    } else {
+      await _googleSignIn.initialize(
+        clientId: GoogleConfig.androidClientId,
+        serverClientId: GoogleConfig.serverClientId,
+      );
+    }
     _initialized = true;
   }
 
