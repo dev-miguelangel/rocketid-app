@@ -41,13 +41,9 @@ class AuthBackendConfig {
   /// Base URL del backend.
   ///
   /// Overridable en build con `--dart-define=API_BASE_URL=https://...`.
-  /// Web servido en HTTPS requiere un backend HTTPS (mixed-content), por lo
-  /// que el build de web debe pasar una URL HTTPS aquí.
-  /// TODO: migrar a HTTPS antes de producción. Mientras tanto, Android requiere
-  /// una excepción de cleartext acotada a este host (ver `docs/google.md`).
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://wlsc6ryuexi1391hw66vm9vz.166.0.112.2.sslip.io',
+    defaultValue: 'https://api.rocketid.cl',
   );
 
   /// Endpoint que intercambia el `idToken` de Google por tokens de la app.
